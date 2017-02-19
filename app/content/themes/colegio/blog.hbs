@@ -1,0 +1,31 @@
+{{!-- Include the header from partials/header.hbs --}}
+{{> header}}
+{{> homepage}}
+
+<!--ignorar esto
+<div class="container">
+    {{!-- Site title & tagline --}}
+    <h1 class="title">{{@settings.title}}</h1>
+    <div class="subtitle">{{@settings.tagline}}</div>
+
+    {{!-- Show the down arrow on page 1 --}}
+    {{#is pagination.current_page '1'}}
+        <a href="#continue" class="continue"><span class="hidden">Continue</span></a>
+    {{/is}}
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 push-md-2 col-sm-10 push-sm-1">
+            {{!-- Include the post loop from partials/loop.hbs --}}
+            {{> loop}}
+
+            {{!-- Include pagination from partials/pagination.hbs --}}
+            {{> pagination}}
+        </div>
+    </div>
+</div>
+-->
+
+{{!-- Include the footer from partials/footer.hbs --}}
+{{> footer}}

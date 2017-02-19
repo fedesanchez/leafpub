@@ -1,0 +1,12 @@
+{{!-- Include the header from partials/header.hbs --}}
+{{> header}}
+
+{{#is @request.homepage}}
+	{{> homepage }}
+	{{else}}
+	NO ES HOMEPAGE
+{{/is}}
+
+
+{{!-- Include the footer from partials/footer.hbs --}}
+{{> footer}}

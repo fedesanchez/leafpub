@@ -1,0 +1,32 @@
+{{!-- Switch to the pagination context --}}
+
+    {{#pagination}}
+        {{#is total_pages '>' 1}}
+          <footer class="pagination">
+            <ul>
+              {{!-- Previous page --}}
+              {{#if previous_page_url}}
+                <li class="pagination-prev">
+                  <a href="{{previous_page_url}}">
+                    <span class="pagenav custom_hover">Anterior</span>
+                  </a>
+                </li>
+              {{/if}}
+              {{!-- Current page --}}
+              {{#is total_pages '>' 1}}
+                  <li class="pagenav custom_hover">
+                      Página {{number current_page}} de {{number total_pages}}
+                  </li>
+              {{/is}}
+
+              {{!-- Next page --}}
+              {{#if next_page_url}}
+                  <li class="pagination-next">
+                      <a href="{{next_page_url}}"><span>Siguiente</span></a>
+                  </div>
+              {{/if}}
+
+            </ul>
+          </footer>
+        {{/is}}
+    {{/pagination}}

@@ -1,0 +1,22 @@
+{{!-- Navigation menu --}}
+<div id="navigation-row" role="navigation">
+  <div class="row-container">
+    <div class="container">
+      <div class="row">
+        <nav class="moduletable navigation  span12">
+          {{!-- Fetch the site's navigation --}}
+          <ul class="sf-menu   sticky" id="module-93">
+            {{#navigation}}
+                {{#each items}}
+                    {{!-- Output the menu item. We can use `current` to detect the current page --}}
+                    <li class=" {{#if current}}current active{{/if}}">
+                      <a href="{{url link}}">{{label}}</a>
+                    </li>
+                {{/each}}
+            {{/navigation}}
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>

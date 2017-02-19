@@ -1,0 +1,33 @@
+{{!-- Include the header from partials/header.hbs --}}
+{{> header}}
+
+
+<div id="content-row">
+  <div class="row-container visible visible-first">
+    <div class="container">
+      <div class="content-inner row">
+        <div id="component" class="span8">
+
+            <main role="main">
+              <section class="page-blog page-blog__">
+
+                    {{#tag}}
+                    <header class="page_header">
+                      <h3 class="visible-first">
+                        <span class="item_title_part0 item_title_part_odd item_title_part_first_half item_title_part_first item_title_part_last">{{name}}</span>
+                      </h3>
+                    </header>
+                    {{/tag}}
+
+                    {{!-- Include the post loop from partials/loop.hbs --}}
+                    {{> loop}}
+
+                    {{> pagination}}
+
+                </section>
+          
+
+
+
+{{!-- Include the footer from partials/footer.hbs --}}
+{{> footer}}

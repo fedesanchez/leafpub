@@ -1,0 +1,9 @@
+{
+    "name": "ElDomo",
+    "description": "theme para el domo.",
+    "version": "0.0.0",
+    "requires": "1.0.0",
+    "author": "Fede Sanchez",
+    "license": "MIT",
+    "url": ""
+}
