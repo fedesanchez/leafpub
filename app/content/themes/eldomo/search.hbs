@@ -2,6 +2,17 @@
 {{> header}}
 
 
+
+              <div class="content">
+                  {{#if query}}
+                      <h4 class="title">Artículos que contengan “{{query}}”</h4>
+                      <div class="subtitle">{{plural pagination.total_items none="No se encontraron resultados" singular="1 artículo encontrado" plural="% artículos encontrados"}}</div>
+                  {{else}}
+                      <h1 class="title">Buscar</h1>
+                      <div class="subtitle">Que estás  buscando??</div>
+                  {{/if}}
+              </div>
+
               <section class="page-blog page-blog__">
 
                     {{#tag}}

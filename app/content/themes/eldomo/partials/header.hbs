@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html xmlns="https://www.w3.org/1999/xhtml" xml:lang="es-es" lang="es-es">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="es-es" lang="es-es">
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 <meta name="generator" content="ElDomo! - "/>
@@ -69,7 +69,7 @@ jQuery(document).ready(function(){
 <link href='//fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
   {{leafpub_head}}
 </head>
-<body class="com_content view-category task- itemid-101 body__">
+<body class="{{body_class}} com_content view-category task- itemid-101 body__">
 
 <div id="wrapper">
 	<div class="wrapper-inner">
@@ -80,7 +80,7 @@ jQuery(document).ready(function(){
 						<header>
 							<div class="row">
 								<div id="logo" class="span4">
-									<a href="#">
+									<a href="{{blog_url}}">
 									<h1>
 										<img src="{{url @settings.logo}}" alt="{{@settings.title}}" />
 									</h1> <span class="hightlight"></span>
@@ -99,22 +99,24 @@ jQuery(document).ready(function(){
 								<div class="moduletable pull-right ">
 									<div class="mod-menu">
 										<ul class="nav menu nav-pills">
-											<li class="item-143"><a class="modalToggle" href="#modal">Login</a>
-											</li><li class="item-215"><a href="#">Site Map</a>
-											</li><li class="item-216"><a href="#">Help</a>
-											</li><li class="item-217"><a href="#">FAQs</a>
+											<li class="item-143">
+												<a class="modalToggle" href="#modal">Login</a>
+											</li>
+											<li class="item-216">
+												<a href="#">Help</a>
+											</li>
+											<li class="item-217">
+												<a href="#">FAQs</a>
 											</li>
 										</ul>
 								</div>
 								</div>
 								<div class="moduletable search-block  span8">
 									<div role="search" class="mod-search mod-search__search-block">
-										<form action="{{search_url}}" method="post" class="navbar-form">
+										<form action="{{search_url}}" method="GET" class="navbar-form">
 										<label for="searchword" class="element-invisible">Buscar...</label>
-										<input id="searchword" name="searchword" maxlength="20" class="inputbox mod-search_searchword" type="text" size="20" placeholder="Search..." required> <input type="image" value="Search" class="button" src="{{theme_url 'images/searchButton.gif'}}" onclick="this.form.searchword.focus();"/>
-										<input type="hidden" name="task" value="search">
-										<input type="hidden" name="option" value="com_search">
-										<input type="hidden" name="Itemid" value="101">
+										<input id="searchword" name="s" maxlength="20" class="inputbox mod-search_searchword" type="text" size="20" placeholder="buscar..." required>
+										<input type="image" value="Search" class="button" src="{{theme_url 'images/searchButton.gif'}}" onclick="this.form.searchword.focus();"/>
 										</form>
 									</div>
 								</div>
@@ -122,7 +124,8 @@ jQuery(document).ready(function(){
 						</header>
 					</div>
 				</div>
-			</div>
+			</div> <!-- header row -->
+
       {{!-- Include the site's navigation from partials/navigation.hbs --}}
       {{#is @settings.maintenance 'off'}}
           {{> navigation}}
@@ -140,4 +143,4 @@ jQuery(document).ready(function(){
           <div class="container">
             <div class="content-inner row">
               <div id="component" class="span10">
-                <main role="main">
+                <main>

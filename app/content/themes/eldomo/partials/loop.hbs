@@ -9,7 +9,7 @@
             <article class="item column-1 visible-first">
 
               <figure class="item_img img-intro img-intro__left">
-                <a href="">
+                <a href="{{post_url}}">
                   <span class="lazy_container lazyloaded" style="width: 270px;">
                     <span class="lazy_preloader" style="padding-top: 68.888888888889%;"></span>
                     {{#if image}}<img src="{{url image}}" class="lazy" alt="" style="display: block;">{{/if}}
@@ -46,7 +46,6 @@
                   </dd>
                   <dd>
                     {{#author}}
-                        {{#if avatar}}<img class="avatar" src="{{url avatar}}" alt="Avatar">{{/if}}
                         <address class="item_createdby">
                           <a class="author" href="{{author_url}}">{{name}}</a>
                         </address>

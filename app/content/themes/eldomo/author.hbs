@@ -1,0 +1,58 @@
+{{!-- Include the header from partials/header.hbs --}}
+{{> header}}
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 push-md-2 col-sm-10 push-sm-1">
+          {{#author}}
+            <div class="author">
+                {{!-- Switch to the author context --}}
+
+                    {{!-- Avatar --}}
+                    {{#if avatar}}
+                        <img class="avatar" src="{{url avatar}}" alt="Avatar">
+                    {{/if}}
+
+                    {{!-- Author details --}}
+                    <div class="details">
+                        <h3 class="title">{{name}}</h3>
+                        {{!-- Location --}}
+                        {{#if location}}
+                            <span class="location">
+                                <span class="icon icon-location"></span>
+                                {{location}}
+                            </span>
+                        {{/if}}
+
+                        {{!-- Website --}}
+                        {{#if website}}
+                            <span class="website">
+                                <span class="icon icon-link"></span>
+                                <a href="{{website}}">{{website}}</a>
+                            </span>
+                        {{/if}}
+                    </div>
+
+                    {{!-- Bio --}}
+                    <div class="bio">{{bio}}</div>
+
+                    {{!-- Post count --}}
+                    <div class="post-count">
+                        {{plural ../pagination.total_items none="No posts" singular="One post" plural="% posts"}}
+                    </div>
+
+            </div>
+            {{/author}}
+
+            {{!-- Include the post loop from partials/loop.hbs --}}
+            {{> loop}}
+
+            {{!-- Include pagination from partials/pagination.hbs --}}
+            {{> pagination}}
+        </div>
+    </div>
+</div>
+
+{{!-- Include the footer from partials/footer.hbs --}}
+{{> footer}}

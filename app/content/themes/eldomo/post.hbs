@@ -1,69 +1,63 @@
 {{!-- Include the header from partials/header.hbs --}}
 {{> header}}
-<div id="content-row">
-<div class="row-container visible visible-first">
-<div class="container">
-<div class="content-inner row">
-<div id="component" class="span8">
 
-  <main role="main">
   {{!-- Switch to the post context --}}
   {{#post}}
 
 
     <article class="page-item page-item__blog page-item__">
-      
-        <header class="item_header">
-          <h4 class="item_title visible-first visible">
-            <span class="item_title_part0 item_title_part_odd item_title_part_first_half item_title_part_first">{{title editable="true"}}</span>
-          </h4>
-        </header>
-          <div class="item_info">
-            <dl class="item_info_dl">
-              <dt class="article-info-term"></dt>
-              <dd>
-                <time class="item_published">
-                  {{date format="%B %e, %Y at %l:%M%P"}}
-                </time>
+
+          <header class="item_header">
+            <h4 class="item_title visible-first visible">
+              <span class="item_title_part0 item_title_part_odd item_title_part_first_half item_title_part_first">{{title editable="true"}}</span>
+            </h4>
+          </header>
+            <div class="item_info">
+              <dl class="item_info_dl">
+                <dt class="article-info-term"></dt>
+                <dd>
+                  <time class="item_published">
+                    {{date format="%B %e, %Y at %l:%M%P"}}
+                  </time>
+                  </dd>
+                <dd>
+                  {{#author}}
+                    <address class="item_createdby"><a href="{{author_url}}">{{name}}</a> </address>
+                  {{/author}}
                 </dd>
-              <dd>
-                {{#author}}
-                  <address class="item_createdby"><a href="{{author_url}}">{{name}}</a> </address>
-                {{/author}}
-              </dd>
-            </dl>
-          </div>
+              </dl>
+            </div>
 
-          <div class="item_img img-full img-full__none item-image">
-            <span class="lazy_container lazyloaded" style="width: 770px;">
-              <span class="lazy_preloader" style="padding-top: 46.233766233766%;"></span>
-              <img src="{{url image}}" class="lazy" alt="" style="display: block;">
-            </span>
-          </div>
+            <div class="item_img img-full img-full__none item-image">
+              <span class="lazy_container lazyloaded" style="width: 770px;">
+                <span class="lazy_preloader" style="padding-top: 46.233766233766%;"></span>
+                <img src="{{url image}}" class="lazy" alt="" style="display: block;">
+              </span>
+            </div>
 
-          <div class="item_fulltext">
-            {{content editable="true"}}
-          </div>
+            <div class="item_fulltext">
+              {{content editable="true"}}
+            </div>
 
 
-          <figcaption>
-            {{!-- Tags --}}
-              {{tags}}
-          </figcaption>
+            <figcaption>
+              {{!-- Tags --}}
+                {{tags}}
+            </figcaption>
 
-          {{!-- Sharing --}}
-          <div class="share col-md-4">
-              Share This Post<br>
-              <a class="share-icon icon icon-twitter" href="https://twitter.com/intent/tweet?text={{encode title}}&amp;url={{encode (post_url)}}">
-                  <span class="hidden">Share on Twitter</span>
-              </a>
-              <a class="share-icon icon icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u={{encode (post_url)}}">
-                  <span class="hidden">Share on Facebook</span>
-              </a>
-              <a class="share-icon icon icon-googleplus" href="https://plus.google.com/share?url={{encode (post_url)}}">
-                  <span class="hidden">Share on Google+</span>
-              </a>
-          </div>
+            {{!-- Sharing --}}
+            <div class="share col-md-4">
+                Share This Post<br>
+                <a class="share-icon icon icon-twitter" href="https://twitter.com/intent/tweet?text={{encode title}}&amp;url={{encode (post_url)}}">
+                    <span class="hidden">Share on Twitter</span>
+                </a>
+                <a class="share-icon icon icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u={{encode (post_url)}}">
+                    <span class="hidden">Share on Facebook</span>
+                </a>
+                <a class="share-icon icon icon-googleplus" href="https://plus.google.com/share?url={{encode (post_url)}}">
+                    <span class="hidden">Share on Google+</span>
+                </a>
+            </div>
 
     </article>
 

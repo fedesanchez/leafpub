@@ -1,75 +1,93 @@
-</main>
-</div>
+						</main>
+					</div> <!-- component (header)-->
 
-<!-- si es la homepage pongo los destacados -->
+					<!-- si es la homepage pongo los destacados -->
 
-{{#is @request.homepage}}
-	{{> destacados }}
-	{{else}}
-	{{> aside }}
-{{/is}}
+						{{#is @request.homepage}}
+							{{> destacados }}
+							{{else}}
 
-</div>
-</div>
-</div>
-</div>
-<div id="push"></div>
+						{{/is}}
 
-</div>
-</div>
+						</div><!-- content-inner (header)-->
+					</div><!-- container (header)-->
+				</div><!-- row container (header)-->
+		</div><!-- content-row (header)-->
+		<div id="push"></div>
+	</div> <!-- wrapper-inner (header)-->
+	</div><!-- wrapper (header)-->
 
 
-<div id="footer-wrapper">
-<div class="footer-wrapper-inner">
 
-<div id="copyright-row" role="contentinfo">
-<div class="row-container">
-<div class="container">
-<div class="row">
-<div id="copyright" class="span12">
-<span class="siteName">News</span>
-<span class="copy">&copy;</span> <span class="year">2017</span> <a class="privacy_link" href="#">Privacy Policy</a>
-</div>
+		<div id="footer-wrapper">
+			<div class="footer-wrapper-inner">
 
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="back-top">
-<a href="#"><span></span> </a>
-</div>
-<div class="modal hide fade moduletable  loginPopup" id="modal"><div class="modal-header"><button type="button" class="close modalClose">×</button><header><h3 class=""><span class="item_title_part0 item_title_part_odd item_title_part_first_half item_title_part_first">Login</span> <span class="item_title_part1 item_title_part_even item_title_part_second_half item_title_part_last">form</span> </h3></header></div><div class="modal-body"><div class="mod-login mod-login__">
-<form action="/joomla_52025/index.php" method="post" id="login-form" class="form-inline">
-<div class="mod-login_userdata">
-<div id="form-login-username" class="control-group">
-<div class="controls">
-<input id="mod-login_username16" class="inputbox mod-login_username" type="text" name="username" tabindex="1" size="18" placeholder="User name" required>
-</div>
-</div>
-<div id="form-login-password" class="control-group">
-<div class="controls">
-<input id="mod-login_passwd16" class="inputbox mod-login_passwd" type="password" name="password" tabindex="2" size="18" placeholder="Password" required>
-</div>
-</div>
-<label for="mod-login_remember16" class="checkbox">
-<input id="mod-login_remember16" class="mod-login_remember" type="checkbox" name="remember" value="yes">
-Remember me </label>
-<div class="mod-login_submit">
-<button type="submit" tabindex="3" name="Submit" class="btn btn-primary">Log in</button>
-</div>
-<ul class="unstyled">
-<li><a href="/joomla_52025/index.php/username-reminder-request" class="" title="Forgot your username?">Forgot your username?</a></li>
-<li><a href="/joomla_52025/index.php/password-reset" class="" title="Forgot your password?">Forgot your password?</a></li>
-<li><a href="/joomla_52025/index.php/user-registration">Create an account</a></li>
-</ul>
-<input type="hidden" name="option" value="com_users">
-<input type="hidden" name="task" value="user.login">
-<input type="hidden" name="return" value="aW5kZXgucGhwP0l0ZW1pZD0xMDE=">
-<input type="hidden" name="6fb6a3e3a5cfd854786b1155a7082ea1" value="1"/> </div>
-</form>
-</div></div></div>
+				<div id="copyright-row" role="contentinfo">
+					<div class="row-container">
+						<div class="container">
+							<div class="row">
+								<div id="copyright" class="span12">
+									<span class="siteName">ElDomo</span>
+									<span class="copy">&copy;</span> <span class="year">2017</span> <a class="privacy_link" href="#"></a>
+								</div>
+							</div>
+						</div>
+						</div>
+				</div>
+			</div>
+		</div>
+
+
+	<div id="back-top">
+		<a href="#"><span></span> </a>
+	</div>
+
+	<div class="modal hide fade moduletable  loginPopup" id="modal">
+		<div class="modal-header">
+			<button type="button" class="close modalClose">×</button>
+			<header>
+				<h3 class="">
+					<span class="item_title_part0 item_title_part_odd item_title_part_first_half item_title_part_first">Login</span>
+					<span class="item_title_part1 item_title_part_even item_title_part_second_half item_title_part_last">form</span>
+				 </h3>
+			 </header>
+		 </div>
+		 <div class="modal-body">
+			 <div class="mod-login mod-login__">
+					<form action="/joomla_52025/index.php" method="post" id="login-form" class="form-inline">
+						<div class="mod-login_userdata">
+								<div id="form-login-username" class="control-group">
+									<div class="controls">
+										<input id="mod-login_username16" class="inputbox mod-login_username" type="text" name="username" tabindex="1" size="18" placeholder="User name" required>
+									</div>
+								</div>
+								<div id="form-login-password" class="control-group">
+									<div class="controls">
+										<input id="mod-login_passwd16" class="inputbox mod-login_passwd" type="password" name="password" tabindex="2" size="18" placeholder="Password" required>
+									</div>
+								</div>
+								<label for="mod-login_remember16" class="checkbox">
+									<input id="mod-login_remember16" class="mod-login_remember" type="checkbox" name="remember" value="yes">
+									Remember me
+								</label>
+								<div class="mod-login_submit">
+									<button type="submit" tabindex="3" name="Submit" class="btn btn-primary">Log in</button>
+								</div>
+								<ul class="unstyled">
+									<li><a href="/joomla_52025/index.php/username-reminder-request" class="" title="Forgot your username?">Forgot your username?</a></li>
+									<li><a href="/joomla_52025/index.php/password-reset" class="" title="Forgot your password?">Forgot your password?</a></li>
+									<li><a href="/joomla_52025/index.php/user-registration">Create an account</a></li>
+								</ul>
+								<input type="hidden" name="option" value="com_users">
+								<input type="hidden" name="task" value="user.login">
+								<input type="hidden" name="return" value="aW5kZXgucGhwP0l0ZW1pZD0xMDE=">
+								<input type="hidden" name="6fb6a3e3a5cfd854786b1155a7082ea1" value="1"/>
+						</div>
+					</form>
+				</div>
+			</div>
+	</div>
+
 <script src="{{theme_url 'js/jquery.centerIn.js'}}"></script>
 <script>
 	// initialise plugins

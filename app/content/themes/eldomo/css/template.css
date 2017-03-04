@@ -3172,13 +3172,13 @@ input[type='checkbox'] {
   content: "\f017";
 }
 .mod-article-single.black {
-  background: url(../images/template/bgblack.jpg) center 0 no-repeat #1c1c1c;
+  background: url(../images/radio.jpg) center 0 no-repeat #1c1c1c;
 }
 .mod-article-single.black .item-title {
   color: white;
 }
 .mod-article-single.white {
-  background: url(../images/template/bgwhite.jpg) center 0 no-repeat #f4f4f4;
+  background: url(../images/delprado.jpg) center 0 no-repeat #f4f4f4;
 }
 .mod-article-single.white .item-title {
   color: #1c1c1c;
@@ -3576,6 +3576,9 @@ blockquote small {
 }
 figcaption a{
   color: white;
+}
+.item_content figcaption a{
+  color :black;
 }
 .page-item__blog .item_info {
   border-bottom: 4px solid #e1e1e1;
