@@ -2,9 +2,16 @@
 
 <form class="login-form" autocomplete="off" data-redirect="{{redirect}}">
     <div class="text-center mb-2">
-        <a href="https://www.leafpub.org/" target="_blank">
+      {{#if @settings.logo}}
+        <a href="/">
+            <img style="width: 370px;" src="{{url @settings.logo}}">
+        </a>
+        {{ else }}
+        <a href="/">
             <img class="logo" src="{{url 'source/assets/img/logo-color.svg'}}">
         </a>
+      {{/if}}
+
     </div>
 
     <div class="form-group">

@@ -100,14 +100,17 @@ jQuery(document).ready(function(){
 									<div class="mod-menu">
 										<ul class="nav menu nav-pills">
 											<li class="item-143">
-												<a class="modalToggle" href="#modal">Login</a>
+												{{#if @user}}
+												    {{@user.name}}
+												  {{ else }}
+												    <a href="{{admin_url}}">Login</a>
+												{{/if}}
 											</li>
+											{{#if @user}}
 											<li class="item-216">
-												<a href="#">Help</a>
+												<a href="{{admin_url}}/logout">Salir</a>
 											</li>
-											<li class="item-217">
-												<a href="#">FAQs</a>
-											</li>
+											{{/if}}
 										</ul>
 								</div>
 								</div>
