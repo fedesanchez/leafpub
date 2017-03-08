@@ -2425,6 +2425,7 @@ h3 {
   line-height: 50px;
   position: relative;
   margin-bottom: 20px;
+  text-transform: capitalize;
 }
 h2:after,
 h3:after {

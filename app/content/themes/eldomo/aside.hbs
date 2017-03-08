@@ -1,56 +1,30 @@
-<div id="aside-right" class="span4">
-<aside role="complementary">
-<div class="moduletable "><header><h3 class="moduleTitle  visible-first"><span class="item_title_part0 item_title_part_odd item_title_part_first_half item_title_part_first">Categories</span> <span class="item_title_part1 item_title_part_even item_title_part_second_half item_title_part_last"></span> </h3></header><ul class="categories-module visible-first">
-<li class="firstItem"> <a href="/joomla_52025/index.php/news/12-donec-eu-elit-in-nisi" class="custom_hover"><span><span>Donec eu elit in nisi</span><strong>Donec eu elit in nisi</strong></span></a>
-</li>
-<li> <a href="/joomla_52025/index.php/news/13-in-neque-arcu-vulputate" class="custom_hover"><span><span>In neque arcu vulputate</span><strong>In neque arcu vulputate</strong></span></a>
-</li>
-<li> <a href="/joomla_52025/index.php/news/14-quisque-gravida-purus-vitae" class="custom_hover"><span><span>Quisque gravida purus vitae</span><strong>Quisque gravida purus vitae</strong></span></a>
-</li>
-<li> <a href="/joomla_52025/index.php/news/15-vivamus-luctus-lectus-sit" class="custom_hover"><span><span>Vivamus luctus lectus sit</span><strong>Vivamus luctus lectus sit</strong></span></a>
-</li>
-<li> <a href="/joomla_52025/index.php/news/16-vivamus-congue-turpis-in-augue" class="custom_hover"><span><span>Vivamus congue turpis in augue</span><strong>Vivamus congue turpis in augue</strong></span></a>
-</li>
-<li class="lastItem"> <a href="/joomla_52025/index.php/news/17-curabitur-eu-dignissim-velit" class="custom_hover"><span><span>Curabitur eu dignissim velit</span><strong>Curabitur eu dignissim velit</strong></span></a>
-</li>
-</ul>
-</div><div class="moduletable "><header><h3 class="moduleTitle visible-first"><span class="item_title_part0 item_title_part_odd item_title_part_first_half item_title_part_first item_title_part_last">Archives</span> </h3></header> <ul class="archive-module visible-first visible">
-<li class="firstItem">
-<a href="/joomla_52025/index.php/archives/2014?view=archive&amp;month=5" class="custom_hover"><span><span>
-May, 2014 </span><strong>
-May, 2014 </strong></span></a>
-</li>
-<li>
-<a href="/joomla_52025/index.php/archives/2014?view=archive&amp;month=4" class="custom_hover"><span><span>
-April, 2014 </span><strong>
-April, 2014 </strong></span></a>
-</li>
-<li>
-<a href="/joomla_52025/index.php/archives/2014?view=archive&amp;month=3" class="custom_hover"><span><span>
-March, 2014 </span><strong>
-March, 2014 </strong></span></a>
-</li>
-<li>
-<a href="/joomla_52025/index.php/archives/2014?view=archive&amp;month=2" class="custom_hover"><span><span>
-February, 2014 </span><strong>
-February, 2014 </strong></span></a>
-</li>
-<li>
-<a href="/joomla_52025/index.php/archives/2014?view=archive&amp;month=1" class="custom_hover"><span><span>
-January, 2014 </span><strong>
-January, 2014 </strong></span></a>
-</li>
-<li>
-<a href="/joomla_52025/index.php/archives/2013?view=archive&amp;month=12" class="custom_hover"><span><span>
-December, 2013 </span><strong>
-December, 2013 </strong></span></a>
-</li>
-<li class="lastItem">
-<a href="/joomla_52025/index.php/archives/2013?view=archive&amp;month=11" class="custom_hover"><span><span>
-November, 2013 </span><strong>
-November, 2013 </strong></span></a>
-</li>
-</ul>
-</div>
-</aside>
-</div>
+{{#is @request.homepage}}
+  {{> aside_homepage }}
+  {{else}}
+      {{#if this.tag}}
+        <!-- si es la pag de tags tmb pongo los banners-->
+        {{> aside_homepage }}
+      {{else}}
+        <div id="aside-right" class="span2">
+          <aside role="complementary">
+            <div class="moduletable ">
+              <header>
+                <h3 class="moduleTitle  visible-first">
+                  <span class="item_title_part0 item_title_part_odd item_title_part_first_half item_title_part_first">Relacionados</span>
+                  <span class="item_title_part1 item_title_part_even item_title_part_second_half item_title_part_last"></span>
+                </h3>
+              </header>
+
+              <ul class="categories-module visible-first">
+                {{#suggested_posts }}
+                    {{#each posts}}
+                        <li> <a href="{{post_url}}"> {{title}} </a> </li>
+                    {{/each}}
+                {{/suggested_posts}}
+              </ul>
+            </div>
+          </aside>
+        </div>
+      {{/if}}
+
+{{/is}}
