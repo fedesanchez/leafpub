@@ -7,7 +7,7 @@
 									<ul id="caroufredsel_91">
 										{{#each posts sort="newest"}}
 											{{#is sticky}}
-												<li class="item" id="item_95">
+												<li class="item">
 													<div class="item_content">
 														<figure class="item_img img-intro img-intro__none">
 															<a href="{{post_url}}">
@@ -18,11 +18,11 @@
 															<figcaption>{{tags}}</figcaption>
 															</a>
 														</figure>
-														<div class="itemInner">
+
+														<div class="item_titulo">
 															<h4 class="item_title item_title__big">
 																<a href="">{{title}}</a>
 															</h4>
-
 															<div class="item_info">
 																<dl class="item_info_dl">
 																	<dt class="article-info-term"></dt>
@@ -31,11 +31,10 @@
 																		{{date format="%B %e, %Y"}}
 																	</time>
 																	</dd>
-
 																</dl>
 															</div>
-
 														</div>
+
 													</div>
 												</li>
 											{{/is}}
@@ -178,7 +177,7 @@
 											<figcaption>{{tags}}</figcaption>
 											</a>
 										</figure>
-										<div class="itemInner">
+										<div class="item_titulo">
 
 												<h4 class="item_title">
 												<a href="{{post_url}}">{{title}}</a>
@@ -283,7 +282,8 @@ jQuery(function($) {
 			height: 'variable',
 			visible		: {
 				min			: 1,
-				max			: 1			},
+				max			: 1
+			},
 			minimum: 1
 		},
 		scroll: {

@@ -9,6 +9,7 @@ $(function() {
         cleanState,
         dropTimeout,
         request,
+        saveAction = $('[data-editor=save]').hasClass('btn-warning') ? 'ds' : 'pb',
         zenMode = Cookies.get('zen') === 'true',
         ready = false,
         canCreateTags = $('#tags').attr('data-can-create-tags') === 'true',
@@ -447,6 +448,24 @@ $(function() {
         if(cmd === 'image') showPanel('.image-panel');
     }
 
+    $('[data-save]').on('click', function(){
+        saveAction = $(this).attr('data-save');
+        switch(saveAction){
+            case 'pb':
+                $('[data-editor=save]').removeClass('btn-warning').removeClass('btn-primary').addClass('btn-success');
+                $('.dropdown-toggle-split').removeClass('btn-warning').removeClass('btn-primary').addClass('btn-success');
+                break;
+            case 'ps':
+                $('[data-editor=save]').removeClass('btn-warning').removeClass('btn-success').addClass('btn-primary');
+                $('.dropdown-toggle-split').removeClass('btn-warning').removeClass('btn-success').addClass('btn-primary');
+                break;
+            case 'ds':
+                $('[data-editor=save]').removeClass('btn-success').removeClass('btn-success').addClass('btn-warning');
+                $('.dropdown-toggle-split').removeClass('btn-success').removeClass('btn-success').addClass('btn-warning');
+                break;
+        }
+    });
+
     // Saves the post and redirects to the posts page on success
     function save() {
         var type = post === '' ? 'POST' : 'PUT',
@@ -460,6 +479,7 @@ $(function() {
         // Show progress
         progress.go(50);
         Leafpub.highlightErrors('.settings-form');
+        var properties = serializePost();
 
         // Send request
         request = $.ajax({
@@ -467,7 +487,7 @@ $(function() {
             type: type,
             data: {
                 post: post,
-                properties: serializePost()
+                properties: properties
             }
         })
         .done(function(res) {
@@ -481,7 +501,13 @@ $(function() {
                 ).then(function() {
                     // Remove save confirmation and redirect
                     window.onbeforeunload = null;
-                    location.href = Leafpub.adminUrl('posts');
+                    if (saveAction === 'pb'){
+                        location.href = Leafpub.adminUrl('posts');
+                    } else {
+                        if (type === 'POST'){
+                            location.href = Leafpub.adminUrl('posts/' + properties.slug);
+                        }
+                    }
                 });
             } else {
                 // Show errors
@@ -519,7 +545,7 @@ $(function() {
             tags: tags,
             tag_data: tagData,
             author: $('#author').val(),
-            status: $('#status').val(),
+            status: (saveAction === 'ds') ? 'draft' : 'published', //$('#status').val(),
             featured: $('#featured').prop('checked'),
             sticky: $('#sticky').prop('checked'),
             page: $('#page').prop('checked'),
@@ -939,8 +965,8 @@ $(function() {
     (function() {
         var btn = $('[data-editor="image"]'),
             bookmark,
-            figure,
-            figcaption,
+            //figure,
+            //figcaption,
             image,
             width,
             height,
@@ -960,9 +986,19 @@ $(function() {
 
             // Get bookmark and selected element
             bookmark = contentEditor.getBookmark();
-            image = $(contentEditor.getSelectedElement()).closest('img');
-            //figure = $(contentEditor.getSelectedElement()).closest('figure');
+            image = contentEditor.getSelectedElement();//).closest('img');
+            //figure = $(contentEditor.getSelectedElement()).closest('figure.image');
             //figcaption = figure.find('figcaption');
+            
+            if ($(image).is('figure')) {
+                $('#image-caption').prop('checked', true);
+                if ($(image.firstChild).is('a')){
+                    image = image.firstChild;
+                }
+                image = image.firstChild;
+            } else {
+                $('#image-caption').prop('checked', false);
+            }
 
             // Get attributes
             src = decodeURI($(image).attr('src') || '');
@@ -992,10 +1028,11 @@ $(function() {
             $('#image-width').val(width);
             $('#image-height').val(height);
             $('#image-class').val(cssClass);
-            $('#image-caption').val(caption);
             $('#image-constrain').prop('checked', true);
             $('.image-open').prop('hidden', href.length === 0);
-            $('.delete-image').prop('hidden', !image.length);
+            //if (image){
+                $('.delete-image').prop('hidden', !image.length);
+            //}
 
             // Toggle button state
             $(btn).addClass('active');
@@ -1096,6 +1133,14 @@ $(function() {
             });
         }
 
+        $('#link-to-image').on('change', function(){
+            if ($(this).prop('checked')){
+                $('#image-href').val($('#image-src').val());
+            } else {
+                $('#image-href').val();
+            }
+        });
+
         // Submit
         $('.image-form').on('submit', function(event) {
             var src = encodeURI($('#image-src').val()),
@@ -1105,7 +1150,7 @@ $(function() {
                 newHeight = $('#image-height').val(),
                 cssClass = $('#image-class').val(),
                 align = $('.image-form').find('input[name="align"]:checked').val();
-                //caption = $('#image-caption').val();
+                caption = $('#image-caption').prop('checked');
 
             event.preventDefault();
 
@@ -1122,7 +1167,7 @@ $(function() {
                     height: newHeight,
                     align: align,
                     "class": cssClass,
-                    //caption: caption
+                    caption: caption
                 });
             } else {
                 contentEditor.image('remove');

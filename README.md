@@ -1,20 +1,19 @@
 # <img src="https://leafpub.org/content/uploads/2016/11/leafpub-logo-1.png" alt="Leafpub" width="300">
-
 **Simple, beautiful publishing.**
+
+### [Website](https://www.leafpub.org/) &nbsp; [Documentation](https://leafpub.org/docs) &nbsp;
+
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Leafpub/leafpub)  &nbsp; [![Twitter Follow](https://img.shields.io/twitter/follow/leafpub.svg?style=social&maxAge=3600)](https://twitter.com/leafpub)
 
 Created by [Cory LaViska](https://twitter.com/claviska)
 
 Maintained by [Marc Apfelbaum](https://twitter.com/karsasmus)
 
-- Website: [leafpub.org](https://www.leafpub.org/)
-- Twitter: [@leafpub](https://twitter.com/leafpub)
-
-
 ![Screenshots](https://www.leafpub.org/content/uploads/2016/07/homepage-splash.png)
 
 ## Requirements
 
-- PHP 5.5+
+- PHP 5.6+ with curl, gd lib, mbstring, openssl & pdo
 - MySQL 5.5.3+
 
 ## Download
@@ -97,11 +96,6 @@ Leafpub is maintained under the [Semantic Versioning guidelines](http://semver.o
 
 ## Developers
 
-**Cory LaViska**
-
-- http://twitter.com/claviska
-- http://github.com/claviska
-
 **Marc Apfelbaum**
 
 - https://twitter.com/karsasmus
@@ -109,7 +103,7 @@ Leafpub is maintained under the [Semantic Versioning guidelines](http://semver.o
 
 ## License
 
-©2016 Cory & Marc
+©2017 Cory & Marc
 
 This software is copyrighted. You may use it under the terms of the GNU GPLv3 or later. See LICENSE.md for licensing details.
 

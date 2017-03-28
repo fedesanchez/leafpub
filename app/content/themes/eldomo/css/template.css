@@ -6917,3 +6917,10 @@ body.mobile #fancybox-thumbs {
     display: none !important;
   }
 }
+.item_titulo{
+  color: black
+}
+.item_titulo h4{
+  font-size: 25px;
+  margin-top: -40px;
+}

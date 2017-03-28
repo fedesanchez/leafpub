@@ -26,6 +26,14 @@ use Leafpub\Events\Tag\Add,
 
 class Tag extends AbstractModel {
     protected static $_instance;
+
+    protected static $allowedCaller = [
+        'Leafpub\\Controller\\AdminController', 
+        'Leafpub\\Controller\\APIController',
+        'Leafpub\\Models\\Post',
+        'Leafpub\\Models\\Tag'
+    ];
+
     /**
     * Constants
     **/
@@ -152,6 +160,10 @@ class Tag extends AbstractModel {
     *
     **/
     public static function create($tag){
+        if (!self::isAllowedCaller()){
+            return false;
+        }
+
         $slug = $tag['slug'];
         // Enforce slug syntax
         $slug = Leafpub::slug($slug);
@@ -207,6 +219,10 @@ class Tag extends AbstractModel {
     *
     **/
     public static function edit($properties){
+        if (!self::isAllowedCaller()){
+            return false;
+        }
+
         // Get the tag
         $slug = $properties['slug'];
         $tag = self::getOne($slug);
@@ -268,6 +284,10 @@ class Tag extends AbstractModel {
     *
     **/
     public static function delete($slug){
+        if (!self::isAllowedCaller()){
+            return false;
+        }
+
         $evt = new Delete($slug);
         Leafpub::dispatchEvent(Delete::NAME, $evt);
 

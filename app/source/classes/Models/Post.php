@@ -27,6 +27,13 @@ use Leafpub\Leafpub,
 
 class Post extends AbstractModel {
     protected static $_instance;
+
+    protected static $allowedCaller = [
+        'Leafpub\\Controller\\AdminController', 
+        'Leafpub\\Controller\\APIController',
+        'Leafpub\\Models\\Post'
+    ];
+    
     /**
     * Constants
     **/
@@ -240,6 +247,10 @@ class Post extends AbstractModel {
     *
     **/
     public static function create($post){
+        if (!self::isAllowedCaller()){
+            return false;
+        }
+
         // Enforce slug syntax
         $slug = $post['slug'];
         $slug = Leafpub::slug($slug);
@@ -274,7 +285,7 @@ class Post extends AbstractModel {
         }
 
         // Don't allow null properties
-        $post['image'] = Upload::getImageId($post['image']);
+        $post['image'] = Upload::getImageId($post['image']) ?: 0;
         $post['meta_title'] = (string) $post['meta_title'];
         $post['meta_description'] = (string) $post['meta_description'];
 
@@ -325,6 +336,10 @@ class Post extends AbstractModel {
     *
     **/
     public static function edit($properties){
+        if (!self::isAllowedCaller()){
+            return false;
+        }
+
         $slug = $properties['slug'];
         // Get the post
         $post = self::getOne($slug);
@@ -422,6 +437,10 @@ class Post extends AbstractModel {
     *
     **/
     public static function delete($slug){
+        if (!self::isAllowedCaller()){
+            return false;
+        }
+        
         // If this post is the custom homepage, update settings
         if($slug === Setting::getOne('homepage')) {
             Setting::update('homepage', '');
@@ -656,8 +675,10 @@ class Post extends AbstractModel {
                 $slug);
         };
 
+        $sort = $options['direction'] === 'next' ? 'ASC' : 'DESC';
+
         $select->where($where);
-        $select->order('pub_date');
+        $select->order('pub_date ' . $sort);
         $select->limit(1);
 
         try {
@@ -1207,6 +1228,10 @@ class Post extends AbstractModel {
 
     // Assign posts to new user
     public static function updateRecepient($oldAuthorId, $newAuthorId){
+        if (!self::isAllowedCaller()){
+            return false;
+        }
+
         try {
             return self::getModel()->update(['author' => $newAuthorId], ['author' => $oldAuthorId]);
         } catch (\Exception $e){

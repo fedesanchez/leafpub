@@ -16,8 +16,14 @@ use DirectoryIterator,
     Leafpub\Model\Setting,
     Leafpub\Renderer;
 
-class Plugin implements ModelInterface {
+class Plugin extends AbstractModel {
     protected static $_instance;
+
+    protected static $allowedCaller = [
+        'Leafpub\\Controller\\AdminController', 
+        'Leafpub\\Controller\\APIController',
+        'Leafpub\\Leafpub'
+    ];
 
     /**
     * Constants
@@ -126,6 +132,10 @@ class Plugin implements ModelInterface {
     }
     
     public static function create($plugin){
+        if (!self::isAllowedCaller()){
+            return false;
+        }
+
         // Is the name valid?
         if(!mb_strlen($plugin['name']) || Leafpub::isProtectedSlug($plugin['name'])) {
             throw new \Exception('Invalid name: ' . $plugin['name'], self::INVALID_NAME);
@@ -162,6 +172,10 @@ class Plugin implements ModelInterface {
     }
     
     public static function edit($plugin){
+        if (!self::isAllowedCaller()){
+            return false;
+        }
+
         // Is the name valid?
         if(!mb_strlen($plugin['name']) || Leafpub::isProtectedSlug($plugin['name'])) {
             throw new \Exception('Invalid name: ' . $plugin['name'], self::INVALID_NAME);
@@ -198,6 +212,10 @@ class Plugin implements ModelInterface {
     }
     
     public static function delete($plugin){
+        if (!self::isAllowedCaller()){
+            return false;
+        }
+
         try {
            $rowCount = self::getModel()->delete(['dir' => $plugin]);
            return ($rowCount > 0);
@@ -267,6 +285,10 @@ class Plugin implements ModelInterface {
     *
     */
     public static function install($zipFile){
+        if (!self::isAllowedCaller()){
+            return false;
+        }
+
         $bPluginJson = false;
         $bPluginPhp = false;
         $bUpdate = false;
@@ -342,6 +364,10 @@ class Plugin implements ModelInterface {
     *
     */
     public static function deinstall($plugin){
+        if (!self::isAllowedCaller()){
+            return false;
+        }
+
         if (!is_dir(Leafpub::path("content/plugins/$plugin"))){
             return false;
         }
@@ -370,6 +396,10 @@ class Plugin implements ModelInterface {
     *
     */
     public static function activate($dir){
+        if (!self::isAllowedCaller()){
+            return false;
+        }
+        
         // Always sanitize user input ;-)
         if (!is_dir(Leafpub::path("content/plugins/$dir"))){
             return false;
@@ -423,6 +453,10 @@ class Plugin implements ModelInterface {
     *
     */
     public static function deactivate($dir){
+        if (!self::isAllowedCaller()){
+            return false;
+        }
+
         if (!is_dir(Leafpub::path("content/plugins/$dir"))){
             return false;
         }

@@ -25,7 +25,7 @@ class Leafpub {
     /**
     * Properties
     **/
-    protected static $database, $language, $listeners, $dispatcher;
+    protected static $database, $language, $listeners, $dispatcher, $logger;
 
     /**
     * Initialize the app
@@ -35,16 +35,35 @@ class Leafpub {
     *
     **/
     public static function run() {
-        // Connect to the database
         try {
+            self::$logger = new \Monolog\Logger('Leafpub::Logger');
+            $logLvl = \Monolog\Logger::INFO;
+            if(LEAFPUB_DEV == 1){
+                self::$logger->pushProcessor(new \Monolog\Processor\IntrospectionProcessor());
+                $logLvl = \Monolog\Logger::DEBUG;
+            }
+            self::$logger->pushHandler(new \Monolog\Handler\RotatingFileHandler(Leafpub::path('log/leafpub.log'), 30, $logLvl));
+            self::$logger->debug('Startup...');
+            // Connect to the database
+        
+            self::$logger->debug('Connecting to database');
             Database::connect();
-        } catch(\Exception $e) {
+        }
+        catch (\UnexpectedValueException $ue){
+            exit(Error::system([
+                'title' => 'Logger Error',
+                'message' => $ue->getMessage()
+            ]));
+        } 
+        catch(\Exception $e) {
             switch($e->getCode()) {
                 case Database::NOT_CONFIGURED:
                     // Database isn't configured, launch the installer
+                    self::$logger->error('Database isn\'t configured');
                     header('Location: ' . self::url('source/installer/'));
                     exit();
                 default:
+                    self::$logger->error('Database Error: ' . $e->getMessage());
                     $title = 'Database Error';
                     $message = 'Unable to connect to the database: ' . $e->getMessage();
             }
@@ -57,6 +76,7 @@ class Leafpub {
 
         // Load settings
         try {
+            self::$logger->debug('Load settings');
             Setting::load();
         } catch(\Exception $e) {
             exit(Error::system([
@@ -67,6 +87,7 @@ class Leafpub {
 
         // Load the language pack
         try {
+            self::$logger->debug('Load language');
             Language::load(Setting::getOne('language'));
         } catch(\Exception $e) {
             exit(Error::system([
@@ -82,6 +103,7 @@ class Leafpub {
         date_default_timezone_set(Setting::getOne('timezone'));
 
          // Create the Symfony EventDispatcher
+        self::$logger->debug('Create event dispatcher');
         self::$dispatcher = new EventDispatcher();
         self::_registerCoreListener();
     }
@@ -101,9 +123,14 @@ class Leafpub {
         self::on(Events\Upload\GenerateThumbnail::NAME, __NAMESPACE__ . '\Models\Upload::handleThumbnail', -999);
     }
 
+    public static function getLogger(){
+        return self::$logger;
+    }
+
     public static function registerPlugins(\Slim\App $app){
         // Only register plugins if the static array is null.
         if (Plugin::$plugins == null){
+            self::$logger->debug('Register plugins');
             try {
                 $plugins = Plugin::getActivatedPlugins();
 
@@ -111,9 +138,14 @@ class Leafpub {
                     $ns = $plugin['dir'];
                     $class = 'Leafpub\\Plugins\\' . $ns . '\\Plugin';
                     $pls[$ns] = new $class($app);
+                    self::$logger->debug('Register plugin \'' . $ns . '\'');
                 }
                 Plugin::$plugins = $pls;
-            } catch (\Exception $e){
+            }
+            catch (\Zend\Db\Adapter\Exception\InvalidQueryException $ze){
+
+            } 
+            catch (\Exception $e){
                 exit(Error::system([
                     'title' => 'Register Plugin Error',
                     'message' => $e->getMessage()
