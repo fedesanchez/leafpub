@@ -22,6 +22,8 @@ use Leafpub\Admin,
     Leafpub\Theme,
     Leafpub\Importer,
     Leafpub\Mailer,
+    Leafpub\Update,
+    Leafpub\Widget,
     Leafpub\Mailer\Mail\MailFactory,
     Leafpub\Mailer\Mail\AddressFactory,
     Leafpub\Events\Application\MailCompose,
@@ -257,7 +259,16 @@ class APIController extends Controller {
         $params = $request->getParams();
         $properties = $params['properties'];
         $slug = $action === 'add' ? $properties['slug'] : $args['slug'];
-        $properties['slug'] = $slug;
+        
+        if ($slug !== $properties['slug']){
+            $properties['oldSlug'] = $slug;
+        } else {
+            $properties['slug'] = $slug;
+        }
+
+        if ($properties['author'] === '=quick='){
+            $properties['author'] = Session::user('slug');
+        }
 
         // If you're not an owner, admin, or editor then you can only add/update your own posts
         if(
@@ -465,6 +476,17 @@ class APIController extends Controller {
             ->write($html);
     }
 
+    public function unlockPost($request, $response, $args){
+        $post = Post::getOne($args['slug']);
+        if($post['meta']['lock'][0] === Session::user('slug')) {
+            return $response->withJson([
+                'success' => Post::unlockPostAfterEdit($post['id'])
+            ]);
+        }
+
+        return $response->withJson(['success' => false]);
+    }
+
     public function activatePlugin($request, $response, $args){
         if (!Session::isRole(['owner', 'admin'])){
             return $response->withJson([
@@ -649,7 +671,8 @@ class APIController extends Controller {
             Leafpub::strftime('%H:%M', strtotime($history['post_data']['pub_date']));
 
         $history['post_data']['pub_date'] =
-            Leafpub::strftime('%d %b %Y', strtotime($history['post_data']['pub_date']));
+            // HTML5 input type=date needs format Y-m-d
+            Leafpub::strftime('%Y-%m-%d', strtotime($history['post_data']['pub_date']));
 
         // Return the requested history item
         return $response->withJson([
@@ -1108,12 +1131,22 @@ class APIController extends Controller {
             'maintenance' => $params['maintenance'] === 'on' ? 'on' : 'off',
             'maintenance_message' => $params['maintenance-message'],
             'hbs_cache' => $params['hbs-cache'] === 'on' ? 'on' : 'off',
-            'mailer' => $params['mailer']
+            'mailer' => $params['mailer'],
+            'showDashboard' => $params['showDashboard'] === 'on' ? 'on' : 'off',
+            'amp' => $params['amp'] === 'on' ? 'on' : 'off'
         ];
 
         // Update settings
         foreach($settings as $name => $value) {
             Setting::edit(['name' => $name, 'value' => $value]);
+        }
+
+        if (!Language::installLanguage($params['language'])){
+            Setting::edit(['name' => 'language', 'value' => 'en-us']);
+            return $response->withJson([
+                'success' => false,
+                'message' => 'Unable to download and install ' . $params['language'] . '. Setting language back to en-us.'
+            ]);
         }
 
         // Send response
@@ -1323,6 +1356,21 @@ class APIController extends Controller {
         $params = $request->getParams();
         $html = '';
         $items = [];
+        $isDashboard = (substr($request->getServerParam('HTTP_REFERER'), -5) == 'admin');
+
+        if ($isDashboard){
+            foreach(Widget::getWidgets() as $widget){
+                if(mb_stristr($widget['name'], $params['query'])){
+                    $items[] = [
+                        'title' => 'Widget: ' . $widget['name'],
+                        'name' => $widget['name'],
+                        'description' => $widget['description'],
+                        'link' => '#',
+                        'icon' => 'fa fa-rocket'
+                    ];
+                }
+            }
+        }
 
         // Search menu items
         foreach(Admin::getMenuItems() as $nav) {
@@ -1706,5 +1754,59 @@ class APIController extends Controller {
             'success' => true,
             'newScheme' => LEAFPUB_SCHEME_VERSION
         ]);
+    }
+
+    public function setDashboard($request, $response, $args){
+        try {
+            $data = $request->getParams('data');
+            Leafpub::getLogger()->debug($data['data']);
+            \Leafpub\Models\Setting::edit(
+                [
+                    'name' => 'dashboard_' . Session::user('slug'),
+                    'value' => $data['data']
+                ]
+            );
+            return $response->withJson(['success' => false]);
+        } catch(\Exception $e){
+            return $response->withJson(['success' => false]);
+        }
+    }
+
+    public function getWidget($request, $response, $args){
+        $widget = $request->getParam('widget');
+
+        $html = Widget::getWidget($widget);
+        if ($html){
+            return $response->withJson([
+                'success' => true,
+                'html' => $html
+            ]);
+        }
+    }
+
+    public function updateCheck($request, $response, $args){
+        if (!Session::isRole(['owner', 'admin'])){
+            return $response->withStatus(403);
+        }
+        $updates = Update::checkForUpdates();
+        
+        $html = Admin::render('partials/update-table',[
+            'updates' => $updates
+        ]);
+
+        return $response->withJson([
+            'success' => true,
+            'html' => $html
+        ]);
+    }
+
+    public function runUpdate($request, $response, $args){
+        if (!Session::isRole(['owner', 'admin'])){
+            return $response->withStatus(403);
+        }
+        $params = $request->getParams();
+        $bRet = Update::doUpdate($params);
+
+        return $response->withJson(['success' => $bRet]);
     }
 }

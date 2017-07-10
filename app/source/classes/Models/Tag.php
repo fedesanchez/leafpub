@@ -31,7 +31,8 @@ class Tag extends AbstractModel {
         'Leafpub\\Controller\\AdminController', 
         'Leafpub\\Controller\\APIController',
         'Leafpub\\Models\\Post',
-        'Leafpub\\Models\\Tag'
+        'Leafpub\\Models\\Tag',
+        'Leafpub\\Importer\\AbstractImporter'
     ];
 
     /**
@@ -191,7 +192,7 @@ class Tag extends AbstractModel {
         $tag['meta_description'] = (string) $tag['meta_description'];
         
         if (!$tag['created']){ 
-            $tag['created'] = new \Zend\Db\Sql\Expression('NOW()');
+            $tag['created'] = Leafpub::localToUtc(date('Y-m-d H:i:s'));
         }
 
         $evt = new Add($tag);
@@ -311,6 +312,7 @@ class Tag extends AbstractModel {
     *
     **/
     public static function getTagsToPost($postId){
+        $tags = [];
         try {
             $table = new Tables\PostTags();
             $select1 = $table->getSql()->select()

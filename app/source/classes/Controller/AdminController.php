@@ -22,6 +22,7 @@ use Leafpub\Admin,
     Leafpub\Theme,
     Leafpub\Importer,
     Leafpub\Mailer,
+    Leafpub\Widget,
     Leafpub\Models\History,
     Leafpub\Models\Post,
     Leafpub\Models\Setting,
@@ -166,7 +167,19 @@ class AdminController extends Controller {
     *
     **/
     public function dashboard($request, $response, $args) {
-        return $response->withRedirect(Admin::url('posts'));
+        if (\Leafpub\Models\Setting::getOne('showDashboard') === 'on'){
+            $html = Admin::render('dashboard', [
+                'title' => Language::term('dashboard'),
+                'scripts' => 'dashboard.min.js',
+                'styles' => 'dashboard.css',
+                'dashboard' => Widget::renderDashboard(Session::user('slug')),
+                //'widgets' => Widget::getWidgets()
+            ]);
+
+            return $response->write($html);
+        } else {
+            return $response->withRedirect(Admin::url('posts'));
+        }
     }
 
     public function plugins($request, $response, $args){
@@ -266,6 +279,13 @@ class AdminController extends Controller {
             return $this->notFound($request, $response);
         }
 
+        // Post is locked by another user
+        if (isset($post['meta']['lock']) && $post['meta']['lock'][0] !== Session::user('slug')){
+            return $this->notFound($request, $response);
+        } elseif(!isset($post['meta']['lock'])){
+            Post::lockPostForEdit($post['id']);
+        }
+        
         $html = Admin::render('posts.edit', [
             'title' => Language::term('edit_post'),
             'scripts' => ['editor.min.js', 'posts.edit.min.js'],

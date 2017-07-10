@@ -65,7 +65,7 @@ class Database extends Leafpub {
             GlobalAdapterFeature::setStaticAdapter(new Adapter($config));
             TableGateway::$prefix = $config['prefix'];
             
-            //self::$database->exec('SET time_zone = "+00:00"');
+            GlobalAdapterFeature::getStaticAdapter()->query('SET time_zone = "+00:00"', Adapter::QUERY_MODE_EXECUTE);
         } catch(\PDOException $e) {
             switch($e->getCode()) {
                 case 1044: // Access denied for database
@@ -140,7 +140,11 @@ class Database extends Leafpub {
                         $dbTable->insert(['id' => 2, 'caption' => '', 'created' => '2017-02-01 12:24:28', 'path' => 'content/uploads/2016/10/', 'filename' => 'sunflower', 'extension' => 'jpg', 'size' => 280779, 'width' => 3000, 'height' => 1990]);
                         $dbTable->insert(['id' => 3, 'caption' => '', 'created' => '2017-02-01 12:24:40', 'path' => 'content/uploads/2016/10/', 'filename' => 'autumn', 'extension' => 'jpg', 'size' => 383879, 'width' => 3000, 'height' => 2000]);
                         $dbTable->insert(['id' => 4, 'caption' => '', 'created' => '2017-02-01 12:24:54', 'path' => 'content/uploads/2016/10/', 'filename' => 'ladybug', 'extension' => 'jpg', 'size' => 277815, 'width' => 3000, 'height' => 1993]);
-                        
+                        $dbTable->insert(['id' => 5, 'caption' => '', 'created' => '2017-02-01 12:24:54', 'path' => 'content/uploads/2016/10/', 'filename' => 'flowers', 'extension' => 'jpg', 'size' => 342200, 'width' => 3000, 'height' => 2000]);
+                        $dbTable->insert(['id' => 6, 'caption' => '', 'created' => '2017-02-01 12:24:54', 'path' => 'content/uploads/2016/10/', 'filename' => 'leaf', 'extension' => 'jpg', 'size' => 220200, 'width' => 3000, 'height' => 2253]);
+                        $dbTable->insert(['id' => 7, 'caption' => '', 'created' => '2017-02-01 12:24:54', 'path' => 'content/uploads/2016/10/', 'filename' => 'note', 'extension' => 'jpg', 'size' => 453700, 'width' => 3000, 'height' => 2000]);
+                        $dbTable->insert(['id' => 8, 'caption' => '', 'created' => '2017-02-01 12:24:54', 'path' => 'content/uploads/2016/10/', 'filename' => 'light', 'extension' => 'jpg', 'size' => 156500, 'width' => 3000, 'height' => 2000]);
+                        $dbTable->insert(['id' => 9, 'caption' => '', 'created' => '2017-02-01 12:24:54', 'path' => 'content/uploads/2016/10/', 'filename' => 'logo-color', 'extension' => 'png', 'size' => 20000, 'width' => 610, 'height' => 610]);
                     }
                 } catch(\PDOException $e){
                     throw new \Exception(
@@ -360,6 +364,22 @@ class Database extends Leafpub {
 
     protected static function updateToVersion3(){
         self::$logger->info(' start updateToVersion3 ');
-        self::$logger->info(' end updateToVersion3 ');
+
+        $adapter = GlobalAdapterFeature::getStaticAdapter();
+        $sql = new \Zend\Db\Sql\Sql($adapter);
+        $isMySQL = (strtolower($adapter->getDriver()->getDatabasePlatformName()) == 'mysql');
+        try {
+            $table = new \Leafpub\Models\Ddl\PostMeta();
+            $tableSQL = $sql->getSqlStringForSqlObject($table);
+            if ($isMySQL){
+                $tableSQL .= ' ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;';
+            }
+            
+            $adapter->query($tableSQL, Adapter::QUERY_MODE_EXECUTE);
+
+            self::$logger->info(' end updateToVersion3 ');
+        }catch(\Exception $e){
+            self::$logger->error($e->getMessage());
+        }
     }
 }

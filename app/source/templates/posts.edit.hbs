@@ -122,6 +122,7 @@
                 <button type="button" class="btn btn-secondary" data-editor="link" title="{{L 'link'}}"><i class="fa fa-link"></i></button>
                 <button type="button" class="btn btn-secondary" data-editor="image" title="{{L 'image'}}"><i class="fa fa-picture-o"></i></button>
                 <button type="button" class="btn btn-secondary" data-editor="embed" title="{{L 'embed'}}"><i class="fa fa-cube"></i></button>
+                <button type="button" class="btn btn-secondary" data-editor="table" title="{{L 'table'}}"><i class="fa fa-table"></i></button>
             </div>
 
             {{!-- Zen mode, settings --}}
@@ -133,13 +134,13 @@
             {{!-- Save --}}
             <div class="btn-group">
                 <button type="button" class="btn {{#is post.status 'published'}}btn-success{{else}}btn-warning{{/is}}" data-editor="save">{{L 'save'}}</button>
-                <button type="button" class="btn {{#is post.status 'published'}}btn-success{{else}}btn-warning{{/is}} dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button type="button" class="btn {{#is post.status 'published'}}btn-success{{else}}btn-warning{{/is}} dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="{{L 'options'}}">
                     <span class="sr-only">Toggle Dropdown</span>
                 </button>
                 <div class="dropdown-menu">
-                    <a class="dropdown-item" data-save="pb" href="#">publish & back</a>
-                    <a class="dropdown-item" data-save="ps" href="#">publish & stay</a>
-                    <a class="dropdown-item" data-save="ds" href="#">draft & stay</a>
+                    <a class="dropdown-item" data-save="pb" href="#">{{L 'published'}}</a>
+                    <!--a class="dropdown-item" data-save="ps" href="#">publish & stay</a-->
+                    <a class="dropdown-item" data-save="ds" href="#">{{L 'draft'}}</a>
                 </div>
             </div>
         </div>
@@ -224,7 +225,7 @@
         <h3>{{L 'image'}}</h3>
         <div class="form-group">
             <label>{{L 'image'}}</label>
-            <div class="picture card">
+            <div class="picture card container">
                 <div class="media-list row" data-type="image">
 
                 </div>
@@ -238,6 +239,10 @@
                     </label>                    
                 </div>
             </div>
+        </div>
+        <div class="form-group">
+            <label for="image-src">{{L 'source'}}</label>
+            <input class="form-control" type="url" name="src" id="image-src">
         </div>
         <div class="form-group">
             <label for="image-alt">{{L 'description'}}</label>
@@ -321,7 +326,8 @@
             <button class="btn btn-secondary delete-image pull-right" type="button"><i class="fa fa-trash-o"></i></button>
             <button class="btn btn-primary" type="submit">{{L 'submit'}}</button>
             <button class="btn btn-secondary" type="button" data-panel="hide">{{L 'cancel'}}</button>
-            <input class="form-control" type="url" name="src" id="image-src" hidden>
+            <!--input class="form-control" type="url" name="src" id="image-src" hidden-->
+            <input class="form-control" type="text" name="sign" id="image-sign" hidden>
         </div>
     </form>
 </div>
@@ -369,6 +375,46 @@
         </div>
     </form>
 </div>
+
+{{!-- Table panel --}}
+<div class="table-panel panel panel-right">
+    <form class="table-form" autocomplete="off" novalidate>
+        <button type="button" class="close btn btn-link" data-panel="hide"><i class="fa fa-remove"></i></button>
+        <h3>{{L 'table'}}</h3>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="table-rows">{{L 'rows'}}</label>
+                    <input class="form-control" type="number" name="rows" id="table-rows" min="0">
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="table-cols">{{L 'cols'}}</label>
+                    <input class="form-control" type="number" name="cols" id="table-cols" min="0">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="table-class">{{L 'class'}}</label>
+            <input class="form-control" type="text" name="class" id="table-class">
+        </div>
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="table-header" id="table-header">
+                        {{L 'add_table_header'}}
+                </label>
+            </div>
+        </div>        
+        <div class="form-group mt-2">
+            <button class="btn btn-secondary delete-table pull-right" type="button"><i class="fa fa-trash-o"></i></button>
+            <button class="btn btn-primary" type="submit">{{L 'submit'}}</button>
+            <button class="btn btn-secondary" type="button" data-panel="hide">{{L 'cancel'}}</button>
+        </div>
+    </form>
+</div>
+
 
 {{!-- Settings panel --}}
 <div class="settings-panel panel panel-right">
@@ -426,7 +472,7 @@
                 <div class="form-group">
                     <label for="image">{{L 'image'}}</label>
                     <input type="hidden" name="image" id="image" value="{{post.image}}">
-                    <div class="post-image card"{{#if post.image}} style="background-image: url('{{url post.image}}');"{{/if}}>
+                    <div class="post-image card container"{{#if post.image}} style="background-image: url('{{img post.image width="300"}}');"{{/if}}>
                          <div class="media-list row" data-type="post-image">
 
                         </div>
@@ -512,10 +558,26 @@
                 <div class="form-group">
                     <label for="meta-title">{{L 'meta_title'}}</label>
                     <input class="form-control" type="text" name="meta-title" id="meta-title" value="{{post.meta_title}}" autofocus>
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">{{L 'recommended'}}: <strong>70</strong></small>
+                        </div>
+                        <div class="col-6 mt-1">
+                            <small class="text-muted right">{{L 'used'}}: <span class="meta-used title">70</span></small>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="meta-description">{{L 'meta_description'}}</label>
                     <textarea class="form-control" name="meta-description" id="meta-description" rows="4">{{post.meta_description}}</textarea>
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">{{L 'recommended'}}: <strong>170</strong></small>
+                        </div>
+                        <div class="col-6 mt-1">
+                            <small class="text-muted right">{{L 'used'}}: <span class="meta-used description">70</span></small>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>{{L 'search_engine_preview'}}</label>

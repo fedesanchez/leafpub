@@ -31,7 +31,8 @@ class Upload extends AbstractModel {
     protected static $allowedCaller = [
         'Leafpub\\Controller\\AdminController', 
         'Leafpub\\Controller\\APIController',
-        'Leafpub\\Models\\Post'
+        'Leafpub\\Models\\Post',
+        'Leafpub\\Importer\\AbstractImporter'
     ];
 
     /**
@@ -164,6 +165,7 @@ class Upload extends AbstractModel {
                     'caption',
                     'path' => new \Zend\Db\Sql\Expression("CONCAT_WS('.', CONCAT(path, filename), extension)"),
                     'thumbnail' => new \Zend\Db\Sql\Expression("CONCAT_WS('.', CONCAT(path, 'thumbnails/' , filename), extension)"),
+                    'img' => new \Zend\Db\Sql\Expression("CONCAT_WS('.', CONCAT('img/', filename), extension)"),
                     'created',
                     'filename',
                     'extension',
@@ -264,23 +266,23 @@ class Upload extends AbstractModel {
             );
         }
 
-        //$target_dir .= '/thumbnails';
-        if(!Leafpub::makeDir(Leafpub::path($target_dir.'thumbnails'))) {
-            throw new \Exception(
-                'Unable to create directory: ' . $target_dir.'thumbnails',
-                self::UNABLE_TO_CREATE_DIRECTORY
-            );
-        }
-        $relative_thumb = "$target_dir"."thumbnails/$filename";
-        $thumb_path = Leafpub::path($relative_thumb);
+        /** As we're generating images on the fly, we don't need thumbnails anymore ;-) **/
+        // if(!Leafpub::makeDir(Leafpub::path($target_dir.'thumbnails'))) {
+        //     throw new \Exception(
+        //         'Unable to create directory: ' . $target_dir.'thumbnails',
+        //         self::UNABLE_TO_CREATE_DIRECTORY
+        //     );
+        // }
+        // $relative_thumb = "$target_dir"."thumbnails/$filename";
+        // $thumb_path = Leafpub::path($relative_thumb);
         
-        // Generate thumbnails via event to give
-        // developers the possibility to overwrite the thumbnail generation
-        $evt = new GenerateThumbnail([
-            'fullPath' => $full_path,
-            'thumbPath' => $thumb_path
-        ]);
-        Leafpub::dispatchEvent(GenerateThumbnail::NAME, $evt);
+        // // Generate thumbnails via event to give
+        // // developers the possibility to overwrite the thumbnail generation
+        // $evt = new GenerateThumbnail([
+        //     'fullPath' => $full_path,
+        //     'thumbPath' => $thumb_path
+        // ]);
+        // Leafpub::dispatchEvent(GenerateThumbnail::NAME, $evt);
        
         //self::generateThumbnail($full_path, $thumb_path);
 
@@ -314,19 +316,22 @@ class Upload extends AbstractModel {
             }
         }
 
+        $created =  date('Y-m-d H:i:s');
         // Generate info to pass back
         $info = [
             'filename' => Leafpub::fileName($filename), // We use filename as our slug
             'extension' => $extension,
-            'path' => $full_path,
-            'relative_path' => $relative_path,
-            'url' => Leafpub::url($relative_path),
-            'thumbnail_path' => $thumb_path,
-            'relative_thumb' => $relative_thumb,
-            'thumbnail' => Leafpub::url($relative_thumb),
+            'path' => $full_path, // will be removed in 1.3
+            'relative_path' => $relative_path, // will be removed in 1.3
+            'url' => Leafpub::url($relative_path), // will be removed in 1.3
+            //'thumbnail_path' => $thumb_path,
+            'relative_thumb' => $relative_thumb, // will be removed in 1.3
+            //'thumbnail' => Leafpub::url($relative_thumb),
             'width' => $width,
             'height' => $height,
-            'size' => $size
+            'size' => $size,
+            'img' => 'img/' . $filename,
+            //'sign' => md5( Leafpub::fileName($filename) . Leafpub::localToUtc($created) . Setting::getOne('auth_key') )
         ];
 
         $evt = new Add($info);
@@ -335,7 +340,7 @@ class Upload extends AbstractModel {
         try {
             $insert = [
                 'path' => $target_dir,
-                'created' => new \Zend\Db\Sql\Expression('NOW()'),
+                'created' => Leafpub::localToUtc($created),
                 'filename' => Leafpub::fileName($filename),
                 'extension' => $extension,
                 'size' => $size,
@@ -351,7 +356,7 @@ class Upload extends AbstractModel {
             if ($id > 0){
                 $evt = new Added($id);
                 Leafpub::dispatchEvent(Added::NAME, $evt);
-
+                $info['sign'] = self::getOne($info['filename'])['sign'];
                 return $id;
              } else {
                 return false;
@@ -415,6 +420,9 @@ class Upload extends AbstractModel {
         $file = self::getOne($filename);
         unlink(Leafpub::path($file['path']));
         unlink(Leafpub::path($file['thumbnail']));
+        Leafpub::removeDir(
+            Leafpub::path('content/cache/' . $filename)
+        );
         
         try {
            $rowCount = self::getModel()->delete(['filename' => $filename]);
@@ -444,6 +452,7 @@ class Upload extends AbstractModel {
         }
         $select = self::getModel()->getSql()->select();
         $select->where->equalTo(new \Zend\Db\Sql\Expression("CONCAT_WS('.', CONCAT(path, filename), extension)"), $path);
+        $select->where->or->equalTo(new \Zend\Db\Sql\Expression("CONCAT_WS('.', CONCAT('img/', filename), extension)"), $path);
         return self::getModel()->selectWith($select)->current()['id'];
     }
 
@@ -511,13 +520,15 @@ class Upload extends AbstractModel {
         $upload['size'] = (int) $upload['size'];
         $upload['width'] = (int) $upload['width'];
         $upload['height'] = (int) $upload['height'];
+        $upload['caption'] = (string) ($upload['caption'] ?: $upload['filename']);
 
         // Convert dates from UTC to local
         $upload['created'] = Leafpub::utcToLocal($upload['created']);
         
         $upload['tags'] = self::getTags($upload['id']);
         $upload['posts'] = self::getPosts($upload['id']);
-
+        $upload['sign'] = md5( $upload['filename'] . $upload['created'] . Setting::getOne('auth_key') );
+        
         return $upload;
     }
 

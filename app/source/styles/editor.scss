@@ -17,6 +17,9 @@ a[href] {
     transition: $leafpub-transition-speed outline-color;
     outline: dashed 2px transparent;
     outline-offset: 8px;
+    &.mce-edit-focus {
+        outline: dashed 2px;  
+    }
     &:hover {
         outline-color: rgba(black, .25);
     }
@@ -59,6 +62,12 @@ a[href] {
 // Hide the ghost container when dragging embeds
 .mce-drag-container {
     display: none !important;
+}
+
+// Inline boundaries for code and links
+a[data-mce-selected],
+code[data-mce-selected] {
+  outline: dashed 1px $leafpub-blue;
 }
 
 // Image selections

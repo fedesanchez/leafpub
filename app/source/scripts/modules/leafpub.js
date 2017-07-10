@@ -74,11 +74,11 @@ $(function() {
 
         // Returns a slug; same as Leafpub::slug()
         slug: function(string) {
-        	return string
+            if (typeof string !== 'string') return '';
+
+        	return slugify(string)
         		// Convert spaces and underscores to dashes
         		.replace(/(\s|_)/g, '-')
-        		// Remove unsafe characters
-        		.replace(/[^A-Z0-9-]/ig, '')
         		// Remove duplicate dashes
         		.replace(/-+/g, '-')
         		// Remove beginning dashes

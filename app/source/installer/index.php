@@ -18,6 +18,7 @@ if(Leafpub::isInstalled()) {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, maximum-scale=1, minimal-ui">
     <link rel="shortcut icon" href="../assets/img/logo-color.png">
     <link rel="stylesheet" href="../assets/css/lib.css">
+    <script src="../assets/js/jquery.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,600,600italic">
 </head>
 <body class="no-menu">
@@ -69,7 +70,12 @@ if(Leafpub::isInstalled()) {
                     </div>
 
                     <!-- Database -->
-                    <h4 class="mt-3">Database</h4>
+                    <h4 class="mt-3">
+                        Database
+                    </h4>
+                    <div class="card card-outline-danger mb-3 text-center">
+                        <small><strong>Warning!</strong> All existing data will be deleted!</small>
+                    </div>
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="form-group">

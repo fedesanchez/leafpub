@@ -50,10 +50,11 @@ $(function() {
                 // Insert image
                 if(res.uploaded.length) {
                     if(res.uploaded[0].extension.match(/(gif|jpg|jpeg|png|svg)$/i)) {
-                        $('.picture').css('background-image', 'url(\'' + res.uploaded[0].thumbnail + '\')');
+                        $('.picture').css('background-image', 'url(\'' + Leafpub.url(res.uploaded[0].img + '?width=300&sign=' + res.uploaded[0].sign) + '\')');
                         $('#image-width').val(res.uploaded[0].width);
                         $('#image-height').val(res.uploaded[0].height);
                         $('#image-slug').val(res.uploaded[0].filename);
+                        $('#image-sign').val(res.uploaded[0].sign);
                         showPanel();
                     }
                 }
@@ -88,10 +89,10 @@ $(function() {
             $('.delete').prop('disabled', values.length === 0);
         },
         doubleClick: function(value, element) {
-            prepareEdit(element);
+            prepareEdit(value);
         },
         getValue: function() {
-            return $(this).attr('data-slug');
+            return [$(this).data('slug'), $(this).data('sign')];
         }
     });
 
@@ -189,7 +190,7 @@ $(function() {
 
     // Edit
     $('.edit').on('click', function(){
-        var element = $('.media-list').selectable('getElements', true)[0];
+        var element = $('.media-list').selectable('value')[0];
         prepareEdit(element);
     });
 
@@ -210,11 +211,11 @@ $(function() {
             $.each(media, function(index, value) {
                 // Add deferreds to the queue
                 $.ajax({
-                    url: Leafpub.url('api/uploads/' + encodeURIComponent(value)),
+                    url: Leafpub.url('api/uploads/' + encodeURIComponent(value[0])),
                     type: 'DELETE'
                 })
                 .done(function(res) {
-                    var item = $('.media-list').selectable('getElements', value);
+                    var item = $('[data-sign=' + value[1] +']');//.selectable('getElements', value);
 
                     // Remove deleted item
                     if(res.success) {
@@ -255,7 +256,7 @@ $(function() {
 
             if(res.uploaded.length) {
                 if(res.uploaded[0].extension.match(/(gif|jpg|jpeg|png|svg)$/i)) {
-                    $('.picture').css('background-image', 'url(\'' + res.uploaded[0].thumbnail + '\')');
+                    $('.picture').css('background-image', 'url(\'' + Leafpub.url(res.uploaded[0].img + '?width=300&sign=' + res.uploaded[0].sign) + '\')');
                     $('#image-width').val(res.uploaded[0].width);
                     $('#image-height').val(res.uploaded[0].height);
                     $('#image-slug').val(res.uploaded[0].filename);
@@ -342,19 +343,19 @@ $(function() {
     });
 
     function prepareEdit(el){
-        var slug = el.getAttribute('data-slug');
         progress.go(50);
         $.ajax({
-            url: Leafpub.url('api/upload/' + slug),
+            url: Leafpub.url('api/upload/' + el[0] + '?width=300&sign=' + el[1]),
             type: 'GET'
         })
         .done(function(res) {
             if (res.success === true){
-                $('.picture').css('background-image', 'url(\'' + Leafpub.url(res.file.thumbnail) + '\')');
+                $('.picture').css('background-image', 'url(\'' + Leafpub.url(res.file.img) + '?width=300&sign=' + res.file.sign +'\')');
                 $('#image-caption').val(res.file.caption);
                 $('#image-width').val(res.file.width);
                 $('#image-height').val(res.file.height);
-                $('#image-slug').val(slug);
+                $('#image-slug').val(el[0]);
+                $('#image-sign').val(res.file.sign);
 
                 if (res.file.tags.length){
                     var tags = res.file.tags,

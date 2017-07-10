@@ -1,0 +1,43 @@
+{{> header}}
+
+{{> menu}}
+
+{{!-- Toolbar --}}
+<div class="container-fluid">
+    <div class="top-toolbar">
+        {{!-- Left side --}}
+        <div class="top-toolbar-section col-6">
+            <h1>
+                {{L 'dashboard'}}
+            </h1>
+        </div>
+        {{!-- Right side --}}
+        <!--div class="top-toolbar-section col-6 text-right">
+            <button title="{{L 'add_new_widget'}}" id="new-widget" class="btn btn-success">
+                <i class="fa fa-plus"></i>
+            </button>
+        </div-->
+    </div>
+</div>
+
+
+{{!-- Main container --}}
+<div class="main-container stretch-down">
+    <div class="_row mt-2">
+        {{!-- Loader --}}
+        <div class="widget-loader valign">
+            <div class="valign-middle text-center">
+                <h4>{{L 'rendering_the_dashboard'}}</h4>
+                <i class="loader loader-xl"></i>
+            </div>
+        </div>
+
+        <div class="grid-stack" hidden>
+            {{#each dashboard}}
+                {{widget}}
+            {{/each}}
+        </div>
+    </div>
+</div>
+
+{{> footer}}

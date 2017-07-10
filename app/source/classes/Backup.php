@@ -115,9 +115,10 @@ class Backup extends Leafpub {
         }
 
         // Generate pathname. Ex: backups/a-leafpub-blog.2016-06-15.tar
+        $filename = str_replace('.', '', self::safeFilename(Setting::getOne('title')));
         $pathname = self::path(
             'backups/' .
-            self::safeFilename(Setting::getOne('title')) .
+            $filename .
             '.' . date('Y-m-d') . '.tar'
         );
         // Loop until we find a unique filename
@@ -125,7 +126,7 @@ class Backup extends Leafpub {
         while(file_exists($pathname)) {
             $pathname = self::path(
                 'backups/' .
-                self::safeFilename(Setting::getOne('title')) .
+                $filename .
                 '.' . date('Y-m-d') . '_' . $i++ . '.tar'
             );
         }
@@ -178,7 +179,8 @@ class Backup extends Leafpub {
         } catch(\Exception $e) {
             // Cleanup the partial tar if it was created
             if(file_exists($pathname)) unlink($pathname);
-
+            // Log error msg to logfile
+            Leafpub::getLogger()->error($e->getMessage());
             throw new \Exception(
                 'Unable to archive backup files: ' . $e->getMessage(),
                 self::UNABLE_TO_CREATE_ARCHIVE
@@ -294,7 +296,7 @@ class Backup extends Leafpub {
 
             // Untar the archive
             $phar = new \PharData($backup['pathname']);
-            $phar->extractTo($tmp_dir);
+            $phar->extractTo($tmp_dir, null, true);
 
             // Restore original execution limit
             ini_set('max_execution_time', $time_limit);

@@ -32,7 +32,8 @@ var assets = 'app/source/assets',
     scripts = {
         source: [
             'app/source/scripts/**/*.js',
-            '!app/source/scripts/modules/**/*.js'
+            '!app/source/scripts/modules/**/*.js',
+            'node_modules/jquery/dist/jquery.js'
         ],
         modules: 'app/source/scripts/modules/**/*.js',
         target: assets + '/js'
@@ -233,6 +234,8 @@ function pruneVendor() {
         '!app/source/vendor/tinymce/tinymce/themes',
         '!app/source/vendor/tinymce/tinymce/themes/modern',
         '!app/source/vendor/tinymce/tinymce/themes/modern/theme.min.js',
+        '!app/source/vendor/tinymce/tinymce/skins',
+        '!app/source/vendor/tinymce/tinymce/skins/lightgray/**',
 
         // zordius/lightncandy
         'app/source/vendor/zordius/lightncandy/.github',

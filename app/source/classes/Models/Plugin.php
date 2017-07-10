@@ -12,9 +12,7 @@ namespace Leafpub\Models;
 use DirectoryIterator,
     ZipArchive,
     Composer\Semver\Comparator,
-    Leafpub\Leafpub,
-    Leafpub\Model\Setting,
-    Leafpub\Renderer;
+    Leafpub\Leafpub;
 
 class Plugin extends AbstractModel {
     protected static $_instance;
@@ -22,7 +20,8 @@ class Plugin extends AbstractModel {
     protected static $allowedCaller = [
         'Leafpub\\Controller\\AdminController', 
         'Leafpub\\Controller\\APIController',
-        'Leafpub\\Leafpub'
+        'Leafpub\\Leafpub',
+        'Leafpub\\Models\\Plugin'
     ];
 
     /**
@@ -347,6 +346,12 @@ class Plugin extends AbstractModel {
         );
         $plugin['dir'] = $ns;
         
+        $plugin['img'] = $plugin['image'];
+
+        unset($plugin['image']);
+        unset($plugin['routes']);
+        unset($plugin['isWidget']);
+        
         if ($bUpdate){
             $res = self::edit($plugin);
         } else {
@@ -419,10 +424,11 @@ class Plugin extends AbstractModel {
 
             unset($plugin['image']);
             unset($plugin['routes']);
+            unset($plugin['isWidget']);
+            
             try{
                 self::create($plugin);
             } catch (\Exception $e){
-                echo $e->getMessage();
                 return false;
             }
         }

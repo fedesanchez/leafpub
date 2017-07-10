@@ -23,7 +23,9 @@ abstract class APlugin {
     private $_requires = '';
     private $_image = '';
     private $_isAdminPlugin = false;
+    private $_isWidget = false;
     private $_dir = '';
+    private $_description = '';
 
     private $_app = null;
 
@@ -46,6 +48,7 @@ abstract class APlugin {
         
         // Fill info vars
         $this->_name = $json['name'];
+        $this->_description = $json['description'];
         $this->_author = $json['author'];
         $this->_version = $json['version'];
         $this->_license = $json['license'];
@@ -54,6 +57,7 @@ abstract class APlugin {
         $this->_image = $json['image'];
         $this->_isAdminPlugin = $json['isAdminPlugin'];
         $this->_dir = $dir;
+        $this->_isWidget = $json['isWidget'];
 
         if ($json['isMiddleware'] == true){
             $this->_app->add($this);
@@ -166,6 +170,21 @@ abstract class APlugin {
         return $this->_license;
     }
 
+    public function getDescription(){
+        return $this->_description;
+    }
+
+    public function getImage(){
+        if ($this->_image === ''){
+            return 'source/assets/img/app-icon.png';
+        }
+        return $this->_image;
+    }
+
+    public function isWidget(){
+        return $this->_isWidget;
+    }
+    
     /**
     * Returns the plugin address
     *

@@ -17,7 +17,8 @@ use Leafpub\Blog,
     Leafpub\Session,
     Leafpub\Models\Setting,
     Leafpub\Models\Tag,
-    Leafpub\Models\User;
+    Leafpub\Models\User,
+    Leafpub\Events\Post\PostViewed;
 
 /**
 * ThemeController
@@ -71,7 +72,8 @@ class ThemeController extends Controller {
     *
     **/
     public function blog($request, $response, $args) {
-        $html = Blog::render($args['page']);
+        $page = isset($args['page']) ? $args['page'] : false;
+        $html = Blog::render($page);
 
         return $html === false ?
             $this->notFound($request, $response) :
@@ -124,14 +126,40 @@ class ThemeController extends Controller {
     *
     **/
     public function post($request, $response, $args) {
+        $preview = Session::isAuthenticated() && isset($request->getParams()['preview']);
         $html = Post::render($args['post'], [
             // Render this post as a preview if the user is logged in and ?preview is in the URL
-            'preview' => Session::isAuthenticated() && isset($request->getParams()['preview'])
+            'preview' => $preview
         ]);
 
-        return $html === false ?
-            $this->notFound($request, $response) :
-            $response->write($html);
+        if ($html === false){
+            return $this->notFound($request, $response);
+        } else {
+            if (!$preview){
+                $ev = new PostViewed(['post' => $args['post'], 'request' => $request]);
+                \Leafpub\Leafpub::dispatchEvent(PostViewed::NAME, $ev);
+            }
+            return $response->write($html);
+        }
+    }
+    
+    public function ampify($request, $response, $args) {
+        $preview = Session::isAuthenticated() && isset($request->getParams()['preview']);
+        $html = Post::render($args['post'], [
+            // Render this post as a preview if the user is logged in and ?preview is in the URL
+            'preview' => $preview,
+            'amp' => true
+        ]);
+
+        if ($html === false){
+            return $this->notFound($request, $response);
+        } else {
+            if (!$preview){
+                $ev = new PostViewed(['post' => $args['post'], 'request' => $request]);
+                \Leafpub\Leafpub::dispatchEvent(PostViewed::NAME, $ev);
+            }
+            return $response->write($html);
+        }
     }
 
     /**
@@ -168,4 +196,11 @@ class ThemeController extends Controller {
             $response->write($html);
     }
 
+    public function sitemap($request, $response, $args){
+        $xml = \Leafpub\Leafpub::generateSitemap();
+
+        return $html === false ?
+            $this->notFound($request, $response) :
+            $response->withHeader('Content-type', 'application/xml')->write($xml);
+    }
 }

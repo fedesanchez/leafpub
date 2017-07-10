@@ -146,8 +146,8 @@ $(function() {
 
             // Update avatar
             if(res.uploaded.length) {
-                $('input[name="avatar"]').val(res.uploaded[0].relative_path);
-                $('.avatar .image').attr('src', res.uploaded[0].url).prop('hidden', false);
+                $('input[name="avatar"]').val(res.uploaded[0].img);
+                $('.avatar .image').attr('src', res.uploaded[0].img + "?width=512&sign=" + res.uploaded[0].sign).prop('hidden', false);
                 $('.avatar .none').prop('hidden', true);
             }
 
@@ -177,8 +177,8 @@ $(function() {
 
             // Update cover
             if(res.uploaded.length) {
-                $('input[name="cover"]').val(res.uploaded[0].relative_path);
-                $('.cover').css('background-image', 'url("' + res.uploaded[0].url + '")');
+                $('input[name="cover"]').val(res.uploaded[0].img);
+                $('.cover').css('background-image', 'url("' + res.uploaded[0].img + '")');
                 $('.remove-cover').prop('hidden', false);
             }
 
@@ -198,6 +198,7 @@ $(function() {
 
     $('.media-file').on('click', function(){
         page = 1;
+        more = true;
         avatar = this.hasAttribute('avatar');
         if (!avatar){
             $('.cover').css('background-image', '');
@@ -207,7 +208,7 @@ $(function() {
             url: Leafpub.url('api/uploads'),
             type: 'GET',
             data: {
-                page: page++,
+                page: page,
                 query: query
             }
         })
@@ -233,12 +234,12 @@ $(function() {
                 scrollTop = $(list).scrollTop(),
                 scrollHeight = list.scrollHeight,
                 height = $(list).height(),
-                padding = 150,
+                padding = 200,
                 query = $('.media-search').val();
 
             if(!request && more && scrollTop + height + padding >= scrollHeight) {
                 // Show progress
-                //progress.go(50);
+                progress.go(50);
 
                 // Load next page
                 if(request) request.abort();
@@ -252,7 +253,6 @@ $(function() {
                 })
                 .done(function(res) {
                     request = null;
-
                     // Are there more pages to load?
                     more = page < res.pagination.total_pages;
 
@@ -263,7 +263,7 @@ $(function() {
                 })
                 .always(function() {
                     // Hide progress
-                    //progress.go(100);
+                    progress.go(100);
                 });
             }
         });
@@ -278,12 +278,12 @@ $(function() {
                     $('.media-list').css('display', 'none').html('');
                     $('.avatar').css('display', 'block');
                     if (!avatar){
-                        $('input[name="cover"]').val(res.file.path);
-                        $('.cover').css('background-image', 'url("' + Leafpub.url(res.file.path) + '")');
+                        $('input[name="cover"]').val(res.file.img);
+                        $('.cover').css('background-image', 'url("' + Leafpub.url(res.file.img) + '")');
                         $('.remove-cover').prop('hidden', false);
                     } else {
-                        $('input[name="avatar"]').val(res.file.path);
-                        $('.avatar .image').attr('src', Leafpub.url(res.file.path)).prop('hidden', false);
+                        $('input[name="avatar"]').val(res.file.img);
+                        $('.avatar .image').attr('src', Leafpub.url(res.file.img)).prop('hidden', false);
                         $('.avatar .none').prop('hidden', true);
                     }
                 }

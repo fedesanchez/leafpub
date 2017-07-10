@@ -38,6 +38,7 @@ $app->group("/api", function() {
     $this->delete('/posts/{slug}', 'Leafpub\Controller\APIController:deletePost');
     $this->get('/posts/render', 'Leafpub\Controller\APIController:renderPost');
     $this->post('/posts/render', 'Leafpub\Controller\APIController:renderPost');
+    $this->get('/posts/unlock/{slug}', 'Leafpub\Controller\APIController:unlockPost');
 
     // Plugins
     $this->get('/plugins', 'Leafpub\\Controller\\APIController:getPlugins');
@@ -89,7 +90,13 @@ $app->group("/api", function() {
 
     // Database update
     $this->post('/update', 'Leafpub\Controller\APIController:updateLeafpubDatabase');
+    $this->get('/update-check', 'Leafpub\Controller\APIController:updateCheck');
+    $this->patch('/update', 'Leafpub\Controller\APIController:runUpdate');
+
+    $this->post('/dashboard', 'Leafpub\Controller\APIController:setDashboard');
     
+    $this->get('/widget', 'Leafpub\Controller\APIController:getWidget');
+
 })->add('Leafpub\Middleware:requireAuth')->add('Leafpub\Middleware:checkDBScheme');
 
 /**
@@ -183,7 +190,11 @@ $app->group("/$frags->search", function() use($frags) {
     $this->get("[/{query}[/$frags->page/{page:[0-9]+}]]", 'Leafpub\Controller\ThemeController:search');
 })->add('Leafpub\Middleware:adjustSearchQuery')->add('Leafpub\Middleware:adjustPageNumbers');
 
+$app->get('/sitemap', 'Leafpub\Controller\ThemeController:sitemap');
+
 // Posts
 $app->get('/{post}', 'Leafpub\Controller\ThemeController:post');
-
+if (Setting::getOne('amp') == 'on'){
+    $app->get('/{post}/amp', 'Leafpub\Controller\ThemeController:ampify');
+}
 ?>

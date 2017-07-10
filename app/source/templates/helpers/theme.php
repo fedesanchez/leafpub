@@ -307,6 +307,12 @@ return [
                 $html .= "\n<meta name=\"" . htmlspecialchars($key) . "\" content=\"" . htmlspecialchars($value) . "\">";
             }
         }
+        
+        if (!\Leafpub\Leafpub::isHomepage()){
+            if (!($options['data']['meta']['amp']) && $options['data']['settings']['amp'] == 'on'){
+                $html .= "\n<link rel=\"amphtml\" href=\"" . $options['data']['meta']['ld_json']['url'] . "/amp\">";
+            }
+        }
 
         // Return raw HTML
         return new \LightnCandy\SafeString($html);
@@ -576,7 +582,7 @@ return [
             $tags = \Leafpub\Models\Tag::getNames();
         }
         if(count($tags)) {
-            return $options['fn'](['tc' => $tags]);
+            return $options['fn'](['tags' => $tags]);
         } else {
             // No posts, do {{else}}
             return $options['inverse'] ? $options['inverse']() : '';
@@ -599,5 +605,5 @@ return [
             return $options['inverse'] ? $options['inverse']() : '';
         }
     }
-
+    
 ];

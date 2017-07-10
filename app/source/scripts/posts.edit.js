@@ -227,6 +227,7 @@ $(function() {
                 $('[data-editor="underline"]').toggleClass('on', this.underline('test'));
                 $('[data-editor="undo"]').prop('disabled', !this.undo('test'));
                 $('[data-editor="unorderedList"]').toggleClass('on', this.unorderedList('test'));
+                $('[data-editor="table"]').toggleClass('on', this.table('test'));
 
                 // Highlight dropdown buttons if at least one menu item is `on`
                 $('.dropdown-menu').each(function() {
@@ -238,8 +239,15 @@ $(function() {
             },
             dblclick: function(event) {
                 // Show appropriate panels on double-click
-                if($(event.target).is('img')) showPanel('.image-panel');
-                if($(event.target).is('[data-embed]')) showPanel('.embed-panel');
+                if($(event.target).is('img')){
+                    showPanel('.image-panel');
+                }
+                if($(event.target).is('[data-embed]')){
+                    showPanel('.embed-panel');  
+                } 
+                if($(event.target).is('td')){
+                    showPanel('.table-panel');
+                }
             },
             paste: function(event) {
                 var clipboardData = event.clipboardData || window.clipboardData,
@@ -278,7 +286,12 @@ $(function() {
             ready: function() {
                 contentEditor = this;
                 makeReady();
+            },
+            /*
+            table_default_attributes: {
+                class: 'table table-hovered'
             }
+            */
         });
     }
 
@@ -323,15 +336,15 @@ $(function() {
                     if(res.uploaded.length) {
                         // Set post image
                         if(target === 'post-image') {
-                            setPostImage(res.uploaded[0].relative_path);
+                            setPostImage(res.uploaded[0].img);
                         }
 
                         // Insert into content
                         if(target === 'content') {
-                            if(res.uploaded[0].filename.match(/\.(gif|jpg|jpeg|png|svg)$/i)) {
+                            if(res.uploaded[0].extension.match(/(gif|jpg|jpeg|png|svg)$/i)) {
                                 // Insert image
                                 contentEditor.image('insert', {
-                                    src: res.uploaded[0].relative_path,
+                                    src: res.uploaded[0].img,
                                     alt: res.uploaded[0].filename,
                                     width: res.uploaded[0].width,
                                     height: res.uploaded[0].height
@@ -340,7 +353,7 @@ $(function() {
                                 // Insert link
                                 contentEditor.insertContent(
                                     $('<a>')
-                                    .attr('href', res.uploaded[0].relative_path)
+                                    .attr('href', res.uploaded[0].img)
                                     .text(res.uploaded[0].filename)
                                     .get(0).outerHTML
                                 );
@@ -440,12 +453,42 @@ $(function() {
         }
 
         // Run special commands
-        if(cmd === 'save') save();
+        switch (cmd){
+            case 'save':
+                save();
+                break;
+            case 'zen':
+                toggleZenMode();
+                break;
+            case 'settings':
+                showPanel('.settings-panel');
+                break;
+            case 'link':
+                showPanel('.link-panel');
+                break;
+            case 'embed':
+                showPanel('.embed-panel');
+                break;
+            case 'image':
+                showPanel('.image-panel');
+                break;
+            case 'table':
+                showPanel('.table-panel');
+                break;
+            default:
+                break;
+        }
+        /*
+        if(cmd === 'save'){
+            save();
+        }
         if(cmd === 'zen') toggleZenMode();
         if(cmd === 'settings') showPanel('.settings-panel');
         if(cmd === 'link') showPanel('.link-panel');
         if(cmd === 'embed') showPanel('.embed-panel');
         if(cmd === 'image') showPanel('.image-panel');
+        if(cmd === 'table'){}
+        */
     }
 
     $('[data-save]').on('click', function(){
@@ -475,7 +518,7 @@ $(function() {
 
         // Don't save if another request is pending
         if(request || !ready) return;
-
+        
         // Show progress
         progress.go(50);
         Leafpub.highlightErrors('.settings-form');
@@ -500,11 +543,19 @@ $(function() {
                     { style: 'success' }
                 ).then(function() {
                     // Remove save confirmation and redirect
-                    window.onbeforeunload = null;
                     if (saveAction === 'pb'){
+                        window.onbeforeunload = null;
+                        if (post){
+                            // Only call unlock if we're saving a post after edit
+                            $.ajax({
+                                type: 'GET',
+                                url: Leafpub.url('api/posts/unlock/' + encodeURIComponent(post)),
+                            });
+                        }
                         location.href = Leafpub.adminUrl('posts');
                     } else {
                         if (type === 'POST'){
+                            window.onbeforeunload = null;
                             location.href = Leafpub.adminUrl('posts/' + properties.slug);
                         }
                     }
@@ -597,11 +648,14 @@ $(function() {
         var slug = $('#slug').val(),
             title =
                 $.trim($('#meta-title').val()) ||
-                $.trim(titleEditor.getContent()),
+                $.trim(titleEditor.getContent()).slice(0,70),
             description =
                 $.trim($('#meta-description').val()) ||
-                $.trim($(contentEditor.getContent()).text());
-
+                $.trim($(contentEditor.getContent()).text()).slice(0,170);
+        
+        $('.meta-used.title').text(title.length);
+        $('.meta-used.description').text(description.length);
+        
         $('.se-slug').text(slug);
         $('.se-title').text(title);
         $('.se-description').text(description);
@@ -617,6 +671,7 @@ $(function() {
     }
 
     // Tooltips
+    /*
     $('.editor-toolbar').find('[title]')
     .tooltip({
         trigger: 'hover',
@@ -628,7 +683,7 @@ $(function() {
             event.preventDefault();
         }
     });
-
+    */
     // Watch for unsaved changes
 	window.onbeforeunload = function() {
         if(ready && cleanState !== JSON.stringify(serializePost())) {
@@ -704,7 +759,7 @@ $(function() {
 
             // Set the post image
             if(res.uploaded.length) {
-                setPostImage(res.uploaded[0].relative_path);
+                setPostImage(res.uploaded[0].img);
             }
 
             // Show feedback
@@ -844,6 +899,7 @@ $(function() {
             $(btn).addClass('active');
         })
         .on('hide.leafpub.panel', function() {
+            $('.media-list').css('display', 'none').html('');
             $(btn).removeClass('active');
         });
 
@@ -965,7 +1021,7 @@ $(function() {
     (function() {
         var btn = $('[data-editor="image"]'),
             bookmark,
-            //figure,
+            figure,
             //figcaption,
             image,
             width,
@@ -982,16 +1038,17 @@ $(function() {
         .on('show.leafpub.panel', function() {
             var src,
                 href,
+                sign,
                 alt;
-
             // Get bookmark and selected element
             bookmark = contentEditor.getBookmark();
             image = contentEditor.getSelectedElement();//).closest('img');
             //figure = $(contentEditor.getSelectedElement()).closest('figure.image');
             //figcaption = figure.find('figcaption');
-            
+
             if ($(image).is('figure')) {
                 $('#image-caption').prop('checked', true);
+                
                 if ($(image.firstChild).is('a')){
                     image = image.firstChild;
                 }
@@ -1008,7 +1065,8 @@ $(function() {
             height = $(image).attr('height') || null;
             cssClass = $(image).attr('class') || null;
             //caption = $(figcaption).html();
-
+            sign = $(image).data('sign');
+            
             // Set alignment radios
             $('.image-align-none').trigger('click');
             if(image) {
@@ -1018,11 +1076,11 @@ $(function() {
             }
 
             // Set fields
-            if (src){
+            /*if (src){
                 $('.picture').css('background-image', 'url(' + Leafpub.url(src) + ')');
-            }
-            
-            $('#image-src').val(src);
+            }*/
+            $('#image-sign').val(sign);
+            $('#image-src').val(src).trigger('change');
             $('#image-href').val(href);
             $('#image-alt').val(alt);
             $('#image-width').val(width);
@@ -1030,9 +1088,9 @@ $(function() {
             $('#image-class').val(cssClass);
             $('#image-constrain').prop('checked', true);
             $('.image-open').prop('hidden', href.length === 0);
-            //if (image){
+            if (image){
                 $('.delete-image').prop('hidden', !image.length);
-            //}
+            }
 
             // Toggle button state
             $(btn).addClass('active');
@@ -1042,18 +1100,22 @@ $(function() {
         })
         .on('hide.leafpub.panel', function() {
             $('.media-list').css('display', 'none').html('');
+            page = 1; // reset the media list
+            more = true; // reset the media list
             $(btn).removeClass('active');
             contentEditor.focus();
         });
 
         $('.media-file').on('click', function(){
-            page = 1;
+            page = 1; // reset the media list
+            more = true // reset the media list
             $('.picture').css('background-image', '');
+            $('.post-image').css('background-image', '');
             $.ajax({
                 url: Leafpub.url('api/uploads'),
                 type: 'GET',
                 data: {
-                    page: page++,
+                    page: page,
                     query: query
                 }
             })
@@ -1071,7 +1133,7 @@ $(function() {
                 prepareEdit(values, type);
             },
             getValue: function() {
-                return $(this).attr('data-slug');
+                return [$(this).data('slug'), $(this).data('sign')];
             }
         });
 
@@ -1080,12 +1142,12 @@ $(function() {
                 scrollTop = $(list).scrollTop(),
                 scrollHeight = list.scrollHeight,
                 height = $(list).height(),
-                padding = 150,
+                padding = 75,
                 query = $('.media-search').val();
 
             if(!request && more && scrollTop + height + padding >= scrollHeight) {
                 // Show progress
-                //progress.go(50);
+                progress.go(50);
 
                 // Load next page
                 if(request) request.abort();
@@ -1099,7 +1161,7 @@ $(function() {
                 })
                 .done(function(res) {
                     request = null;
-
+            
                     // Are there more pages to load?
                     more = page < res.pagination.total_pages;
 
@@ -1110,24 +1172,25 @@ $(function() {
                 })
                 .always(function() {
                     // Hide progress
-                    //progress.go(100);
+                    progress.go(100);
                 });
             }
         });
 
         function prepareEdit(el, type){
             $.ajax({
-                url: Leafpub.url('api/upload/' + el),
+                url: Leafpub.url('api/upload/' + el[0] + '?width=300&sign=' + el[1]),
                 type: 'GET'
             })
             .done(function(res) {
                 if (res.success === true){
                     if (type === 'post-image'){
                         $('.media-list').css('display', 'none').html('');
-                        setPostImage(res.file.path);
+                        setPostImage(res.file.img);
                     } else {
-                        $('#image-src').val(res.file.path).trigger('change');
-                        $('#image-caption').val(res.file.caption);
+                        $('#image-sign').val(res.file.sign);
+                        $('#image-alt').val(res.file.caption);
+                        $('#image-src').val(res.file.img).trigger('change');
                     }
                 }
             });
@@ -1149,8 +1212,9 @@ $(function() {
                 newWidth = $('#image-width').val(),
                 newHeight = $('#image-height').val(),
                 cssClass = $('#image-class').val(),
-                align = $('.image-form').find('input[name="align"]:checked').val();
-                caption = $('#image-caption').prop('checked');
+                align = $('.image-form').find('input[name="align"]:checked').val(),
+                caption = $('#image-caption').prop('checked'),
+                sign = $('#image-sign').val();
 
             event.preventDefault();
 
@@ -1167,7 +1231,8 @@ $(function() {
                     height: newHeight,
                     align: align,
                     "class": cssClass,
-                    caption: caption
+                    caption: caption,
+                    sign: sign
                 });
             } else {
                 contentEditor.image('remove');
@@ -1200,9 +1265,9 @@ $(function() {
                 // Update the image
                 if(res.uploaded.length) {
                     if(res.uploaded.length) {
-                        $('.picture').css('background-image', 'url(\'' + res.uploaded[0].thumbnail + '\')');
-                        $('.media-list').css('display', 'none').html('');
-                        $('#image-src').val(res.uploaded[0].relative_path).trigger('change');
+                        //$('.picture').css('background-image', 'url(\'' + res.uploaded[0].img + '?width=300&sign=' + res.uploaded[0].sign + '\')');
+                        //$('.media-list').css('display', 'none').html('');
+                        $('#image-src').val(res.uploaded[0].img).trigger('change');
                     }
                 }
 
@@ -1216,10 +1281,18 @@ $(function() {
         // Image changes
         $('#image-src').on('change', function() {
             var src = $(this).val(),
+                preview,
+                oldWith =  $('#image-width').val(),
+                oldHeight = $('#image-height').val(),
                 img;
 
             if(src.length) {
-                src = Leafpub.url(src);
+                //src = Leafpub.url(src);
+                if (src.indexOf('http') === -1){
+                    preview = Leafpub.url(src) + '?width=300&sign=' + $('#image-sign').val();
+                } else {
+                    preview = src;
+                }
             } else {
                 return;
             }
@@ -1231,15 +1304,28 @@ $(function() {
                 .one('load', function() {
                     width = this.naturalWidth;
                     height = this.naturalHeight;
-                    $('#image-width').val(width);
-                    $('#image-height').val(height);
+                    if (!oldWith){
+                        $('#image-width').val(width);
+                    }
+                    if (!oldHeight){
+                        $('#image-height').val(height);
+                    }
                     $(img).remove();
+                    $('.picture').css('background-image', 'url(\'' + preview + '\')');
+                    $('.media-list').css('display', 'none').html('');
                 })
                 .on('error', function() {
                     $(img).remove();
                 })
                 .appendTo('body')
                 .attr('src', src);
+        })
+        .on('paste', function(evt){
+            var inp = this;
+            // We need to wait a little bit until input's value is set.
+            setTimeout(function(){
+                $(inp).trigger('change');
+            }, 100);
         });
 
         // Constrain proportions
@@ -1262,6 +1348,49 @@ $(function() {
             // Remember new width/height
             width = newWidth;
             height = newHeight;
+        });
+    })();
+
+    // Table
+    (function(){
+        var btn = $('[data-editor="table"]'),
+            cols,
+            rows,
+            table_class,
+            add_header,
+            table;
+        
+        $('.table-panel')
+            .on('show.leafpub.panel', function(){
+                table = $(contentEditor.getSelectedElement()).closest('.table');
+                if (table.hasClass('table')){
+                    rows = $('tr', table.find('tbody')).length;
+                    cols = $('td', table.find('tbody')).length / rows;
+                    $('#table-cols').val(cols);
+                    $('#table-rows').val(rows);
+                }
+            })
+            .on('shown.leafpub.panel', function(){
+
+            })
+            .on('hide.leafpub.panel', function(){
+                $('#table-cols').val(0);
+                $('#table-rows').val(0);
+            });
+
+        $('.table-form').on('submit', function(event){
+            event.preventDefault();
+            cols = $('#table-cols').val() || 3;
+            rows = $('#table-rows').val() || 3;
+            table_class = $('#table-class').val() || '';
+            add_header = $('#table-header').prop('checked');
+            console.log(table);
+            if (!table){
+                var table = contentEditor.table('insert', {cols: cols, rows: rows, table_class: table_class, head: add_header});
+                
+            } else {
+                
+            }
         });
     })();
 
