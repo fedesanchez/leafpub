@@ -140,7 +140,7 @@
                 <div class="dropdown-menu">
                     {{#is @user.role 'in' 'admin,editor'}}
                       <a class="dropdown-item" data-save="pb" href="#">{{L 'published'}}</a>
-                    {{/if}}
+                    {{/is}}
                     <!--a class="dropdown-item" data-save="ps" href="#">publish & stay</a-->
                     <a class="dropdown-item" data-save="ds" href="#">{{L 'draft'}}</a>
                 </div>
