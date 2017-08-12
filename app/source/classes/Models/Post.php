@@ -1149,10 +1149,10 @@ class Post extends AbstractModel {
                 $time = strtotime(Leafpub::utcToLocal($ret['lock'][1]));
                 $diff = date('U') - $time;
                 // If difference between lock date and now is gt 1 unlock automatically
-                if (round($diff / (3600*24)) >= 1){
+                //if (round($diff / (3600*24)) >= 1){
                     self::unlockPostAfterEdit($post_id);
                     unset($ret['lock']);
-                }
+                //}
             }
             return $ret;
         } catch(\Exception $e){
