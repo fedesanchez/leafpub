@@ -88,8 +88,8 @@ class Post extends AbstractModel {
         $options = $evt->getEventData();
 
         // Convert dates to UTC
-        if($options['start_date']) $start_date = Leafpub::localToUtc($options['start_date']);
-        if($options['end_date']) $end_date = Leafpub::localToUtc($options['end_date']);
+        if($options['start_date']) $options['start_date'] = Leafpub::localToUtc($options['start_date']);
+        if($options['end_date']) $options['end_date'] = Leafpub::localToUtc($options['end_date']);
 
         // If there's a query of > 4 chars, make it a fulltext search
         $is_fulltext = mb_strlen($options['query']) >= 4;
@@ -515,8 +515,8 @@ class Post extends AbstractModel {
         $select->from($prefix.'view_posts');
 
         // Convert dates to UTC
-        if($options['start_date']) $start_date = Leafpub::localToUtc($options['start_date']);
-        if($options['end_date']) $end_date = Leafpub::localToUtc($options['end_date']);
+        if($options['start_date']) $options['start_date'] = Leafpub::localToUtc($options['start_date']);
+        if($options['end_date']) $options['end_date'] = Leafpub::localToUtc($options['end_date']);
 
         $where = function($wh) use($options, $prefix, $is_fulltext){
             if($is_fulltext) {
@@ -627,8 +627,8 @@ class Post extends AbstractModel {
         $select->from($prefix.'view_posts');
 
         // Convert dates to UTC
-        if($options['start_date']) $start_date = Leafpub::localToUtc($options['start_date']);
-        if($options['end_date']) $end_date = Leafpub::localToUtc($options['end_date']);
+        if($options['start_date']) $options['start_date'] = Leafpub::localToUtc($options['start_date']);
+        if($options['end_date']) $options['end_date'] = Leafpub::localToUtc($options['end_date']);
 
         $where = function($wh) use($options, $prefix, $slug){
             if($options['author']){
@@ -727,8 +727,8 @@ class Post extends AbstractModel {
         ], (array) $options);
 
         // Convert dates to UTC
-        if($options['start_date']) $start_date = Leafpub::localToUtc($options['start_date']);
-        if($options['end_date']) $end_date = Leafpub::localToUtc($options['end_date']);
+        if($options['start_date']) $options['start_date'] = Leafpub::localToUtc($options['start_date']);
+        if($options['end_date']) $options['end_date'] = Leafpub::localToUtc($options['end_date']);
 
         $prefix = Tables\TableGateway::$prefix;
         $select = new \Zend\Db\Sql\Sql(self::getModel()->getAdapter());
@@ -1149,10 +1149,10 @@ class Post extends AbstractModel {
                 $time = strtotime(Leafpub::utcToLocal($ret['lock'][1]));
                 $diff = date('U') - $time;
                 // If difference between lock date and now is gt 1 unlock automatically
-                //if (round($diff / (3600*24)) >= 1){
+                if (round($diff / (3600*24)) >= 1){
                     self::unlockPostAfterEdit($post_id);
                     unset($ret['lock']);
-                //}
+                }
             }
             return $ret;
         } catch(\Exception $e){
